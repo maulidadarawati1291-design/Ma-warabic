@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { Nunito, Noto_Naskh_Arabic } from "next/font/google";
+import { Baloo_2, Noto_Naskh_Arabic } from "next/font/google";
 import "./globals.css";
 
-const sans = Nunito({ subsets: ["latin"], variable: "--font-nunito" });
+const sans = Baloo_2({ subsets: ["latin"], weight: ["500", "700", "800"], variable: "--font-baloo" });
 const arab = Noto_Naskh_Arabic({ subsets: ["arabic"], variable: "--font-arab" });
 
 export const metadata: Metadata = {
