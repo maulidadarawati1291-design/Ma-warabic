@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@theme {
+  --color-hijau: #2f7d4f;
+  --color-hijau-tua: #1f5c3a;
+  --color-krem: #fdf6e3;
+  --color-pastel: #e3f1e3;
+  --color-emas: #f2b84b;
+  --font-sans: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
+}
+
+body { background: var(--color-krem); color: #243b2f; }
+.arab { font-family: var(--font-arab), serif; direction: rtl; line-height: 1.9; }
+:focus-visible { outline: 3px solid var(--color-emas); outline-offset: 2px; }
