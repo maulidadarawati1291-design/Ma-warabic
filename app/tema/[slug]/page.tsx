@@ -13,7 +13,7 @@ export default async function TemaPage({ params }: { params: Promise<{ slug: str
   if (!theme) notFound();
   return (
     <main className="mx-auto max-w-3xl px-4 py-6">
-      <Link href="/#peta" className="btn">← Peta Petualangan</Link>
+      <Link href="/peta" className="btn">← Peta Petualangan</Link>
       <ThemeView theme={theme} />
     </main>
   );

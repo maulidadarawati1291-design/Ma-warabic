@@ -1,6 +1,7 @@
-export type Result = { score: number; total: number; wrong: string[] };
-export type Progress = Record<string, Result>;
-const KEY = "mawaarabic:v1";
+export type Res = { score: number; total: number };
+export type Prog = Record<string, Record<string, Res>>; // tema -> game -> hasil terbaik
+export type Profil = { nama: string; absen: string; avatar: string };
+const PK = "mawarabic:profil";
 
 // Suara memakai Web Speech API peramban. Untuk audio rekaman guru, ganti dengan file di /public/audio.
 export function speak(text: string) {
@@ -12,15 +13,25 @@ export function speak(text: string) {
   window.speechSynthesis.speak(u);
 }
 
-export function loadProgress(): Progress {
-  try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch { return {}; }
+export const idOf = (nama: string, absen: string) => `${absen.trim()}-${nama.trim().toLowerCase()}`;
+export function getProfil(): Profil | null {
+  try { return JSON.parse(localStorage.getItem(PK) || "null"); } catch { return null; }
 }
-
-export function saveResult(slug: string, r: Result) {
-  const p = loadProgress();
-  if (!p[slug] || r.score >= p[slug].score) p[slug] = r;
-  try { localStorage.setItem(KEY, JSON.stringify(p)); } catch {}
+export function setProfil(p: Profil) {
+  try { localStorage.setItem(PK, JSON.stringify(p)); } catch {}
 }
+const cur = () => { const p = getProfil(); return p ? idOf(p.nama, p.absen) : "tamu"; };
 
-export const stars = (r: Result) => { const x = r.score / r.total; return x >= 0.8 ? 3 : x >= 0.6 ? 2 : 1; };
+// Progres disimpan per siswa (nama + nomor absen), jadi satu perangkat bisa dipakai bergantian.
+export function loadProg(id = cur()): Prog {
+  try { return JSON.parse(localStorage.getItem("mawarabic:v2:" + id) || "{}"); } catch { return {}; }
+}
+export function saveRes(slug: string, game: string, r: Res) {
+  const p = loadProg();
+  const o = p[slug]?.[game];
+  if (!o || r.score >= o.score) p[slug] = { ...p[slug], [game]: r };
+  try { localStorage.setItem("mawarabic:v2:" + cur(), JSON.stringify(p)); } catch {}
+}
+export const points = (p: Prog) => Object.values(p).flatMap((g) => Object.values(g)).reduce((a, r) => a + r.score * 10, 0);
+export const perfect = (r?: Res) => !!r && r.score >= r.total;
 export const shuffle = <T,>(a: T[]) => [...a].sort(() => Math.random() - 0.5);

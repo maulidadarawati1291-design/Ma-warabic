@@ -1,31 +1,60 @@
-import type { CSSProperties } from "react";
-import ThemeMap from "@/components/ThemeMap";
+"use client";
+import { useEffect, useState, type CSSProperties } from "react";
+import { useRouter } from "next/navigation";
+import { AVATARS } from "@/lib/data";
+import { getProfil, idOf, loadProg, points, setProfil } from "@/lib/util";
 import { Illus } from "@/components/Illus";
 
-export default function Home() {
+export default function Masuk() {
+  const r = useRouter();
+  const [nama, setNama] = useState("");
+  const [absen, setAbsen] = useState("");
+  const [av, setAv] = useState("");
+  const [pts, setPts] = useState(0);
+  useEffect(() => { const p = getProfil(); if (p) { setNama(p.nama); setAbsen(p.absen); setAv(p.avatar); } }, []);
+  useEffect(() => { setPts(nama.trim() && absen.trim() ? points(loadProg(idOf(nama, absen))) : 0); }, [nama, absen]);
+  const can = nama.trim() && absen.trim() && AVATARS.some((a) => a.e === av && pts >= a.min);
+
+  function go(e: React.FormEvent) {
+    e.preventDefault();
+    if (!can) return;
+    setProfil({ nama: nama.trim(), absen: absen.trim(), avatar: av });
+    r.push("/peta");
+  }
+  const field = "w-full rounded-2xl border-4 border-[#ffd23f] bg-white px-4 py-2 text-xl font-bold";
   return (
-    <main>
-      <header className="relative overflow-hidden px-4 pb-20 pt-12 text-center" style={{ background: "linear-gradient(135deg,#ffb830,#ff8fc0 55%,#c4a8ff)" }}>
-        <div className="mx-auto flex max-w-3xl flex-col items-center gap-3">
-          <div className="flex gap-2">
-            {["🦁", "🐘", "🍎", "📚", "🐒"].map((e, i) => (
-              <span key={e} className={i % 2 ? "motion-safe:animate-bounce" : ""}><Illus e={e} size={56} /></span>
-            ))}
-          </div>
-          <p className="arab text-7xl font-extrabold text-white" style={{ textShadow: "0 5px 0 #2b2350" }}>مَرْحَبًا</p>
-          <h1 className="text-4xl font-extrabold">Ma'waArabic</h1>
-          <p className="text-xl font-bold">Ayo belajar bahasa Arab sambil bermain!</p>
-          <a href="#peta" className="btn mt-2 text-2xl" style={{ "--c": "#ffd23f" } as CSSProperties}>▶ Mulai Petualangan</a>
-          <p className="text-sm font-bold">MI Kelas V–VI • Fase C • CEFR A1</p>
+    <main className="mx-auto max-w-xl px-4 py-8 text-center">
+      <div className="grad rounded-[2rem] px-4 py-8 shadow-lg" style={{ backgroundImage: "linear-gradient(135deg,#ffb830,#ff8fc0,#c4a8ff,#7fd8ff)" }}>
+        <div className="flex justify-center gap-2">
+          {["🦁", "🐘", "🐼", "🦄", "🐲"].map((e, i) => <span key={e} className="bob" style={{ animationDelay: `${i * 0.3}s` }}><Illus e={e} size={52} /></span>)}
         </div>
-        <svg viewBox="0 0 1200 60" preserveAspectRatio="none" className="absolute inset-x-0 bottom-0 h-10 w-full" aria-hidden="true">
-          <path d="M0 30 Q150 0 300 30 T600 30 T900 30 T1200 30 V60 H0Z" fill="#bfe9ff" />
-        </svg>
-      </header>
-      <ThemeMap />
-      <footer className="px-4 pb-8 text-center text-xs font-semibold">
-        Ilustrasi kata: Twemoji © Twitter, Inc. dan kontributor, lisensi CC-BY 4.0.
-      </footer>
+        <p className="arab text-7xl font-extrabold text-white" style={{ textShadow: "0 5px 0 #2b2350" }}>مَرْحَبًا</p>
+        <h1 className="text-4xl font-extrabold">Ma'warabic</h1>
+        <p className="text-lg font-bold">Ayo belajar bahasa Arab sambil bermain!</p>
+      </div>
+      <form onSubmit={go} className="card mt-6 bg-white p-5 text-left" style={{ "--c": "#ff8fc0" } as CSSProperties}>
+        <label className="block font-extrabold">Namamu
+          <input className={field} value={nama} onChange={(e) => setNama(e.target.value)} placeholder="Tulis namamu" maxLength={30} autoComplete="off" />
+        </label>
+        <label className="mt-3 block font-extrabold">Nomor absen
+          <input className={field} value={absen} onChange={(e) => setAbsen(e.target.value.replace(/\D/g, ""))} placeholder="Contoh: 7" inputMode="numeric" maxLength={3} />
+        </label>
+        <p className="mt-4 font-extrabold">Pilih profilmu <span className="text-sm">(⭐ {pts} poin)</span></p>
+        <p className="text-sm font-bold">Kumpulkan poin dari jawaban benar untuk membuka profil keren lainnya.</p>
+        <div className="mt-2 grid grid-cols-5 gap-2" role="radiogroup" aria-label="Pilih profil">
+          {AVATARS.map((a) => {
+            const lock = pts < a.min;
+            return (
+              <button type="button" key={a.e} role="radio" aria-checked={av === a.e} disabled={lock} onClick={() => setAv(a.e)}
+                className={`wiggle grid place-items-center rounded-2xl p-1 text-xs font-bold disabled:opacity-50 disabled:grayscale ${av === a.e ? "bg-[#ffd23f] ring-4 ring-[#2b2350]" : "bg-[#f3ecff]"}`}>
+                <Illus e={a.e} size={44} />
+                {lock ? `🔒 ${a.min}` : a.n}
+              </button>
+            );
+          })}
+        </div>
+        <button type="submit" disabled={!can} className="btn mt-5 w-full justify-center text-2xl">▶ Masuk</button>
+      </form>
     </main>
   );
 }

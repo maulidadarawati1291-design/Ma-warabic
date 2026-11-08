@@ -144,3 +144,17 @@ export const themes: Theme[] = [
 نَهْرٌ|Sungai|🏞️`),
     ex: [S("هَذَا طَعَامٌ", "Ini makanan."), S("مَعِيَ مَاءٌ", "Saya membawa air.")] },
 ];
+
+export const GAMES = [
+  { id: "kamus", n: "Kamus Bergambar", e: "📖" },
+  { id: "kuis", n: "Kuis Pintar", e: "🎮" },
+  { id: "cocok", n: "Cocokkan Kartu", e: "🃏" },
+  { id: "balon", n: "Pecah Balon", e: "🎈" },
+];
+
+// min = poin yang dibutuhkan untuk membuka profil (1 jawaban benar = 10 poin).
+export const AVATARS = [
+  { e: "🦁", n: "Singa", min: 0 }, { e: "🐘", n: "Gajah", min: 0 }, { e: "🐼", n: "Panda", min: 0 }, { e: "🦊", n: "Rubah", min: 0 },
+  { e: "🐯", n: "Harimau", min: 100 }, { e: "🦄", n: "Unicorn", min: 250 }, { e: "🐲", n: "Naga", min: 500 },
+  { e: "🚀", n: "Astronot", min: 800 }, { e: "🤖", n: "Robot", min: 1200 }, { e: "🦸", n: "Pahlawan", min: 1800 },
+];

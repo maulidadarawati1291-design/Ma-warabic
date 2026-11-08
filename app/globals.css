@@ -24,3 +24,22 @@ body {
 .pop { animation: pop .35s; }
 @keyframes pop { 0% { transform: scale(.8); } 60% { transform: scale(1.08); } 100% { transform: scale(1); } }
 @media (prefers-reduced-motion: reduce) { .flip-in { transition: none; } .pop { animation: none; } }
+
+@keyframes float { from { transform: translate(0, 0) rotate(-4deg); } to { transform: translate(24px, -30px) rotate(4deg); } }
+.float { animation: float var(--d, 8s) ease-in-out infinite alternate; }
+@keyframes bob { 50% { transform: translateY(-8px); } }
+.bob { animation: bob 2.5s ease-in-out infinite; }
+@keyframes drift { to { transform: translateX(40px); } }
+.drift { animation: drift 9s ease-in-out infinite alternate; }
+@keyframes pulse2 { 50% { transform: scale(1.15); } }
+.sun { transform-box: fill-box; transform-origin: center; animation: pulse2 3s ease-in-out infinite; }
+@keyframes shift { 50% { background-position: 100% 50%; } }
+.grad { background-size: 200% 200%; animation: shift 8s ease infinite; }
+@keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+.confetti { position: absolute; top: -20px; width: 10px; height: 14px; border-radius: 2px; animation: fall linear forwards; }
+@keyframes wig { 25% { transform: rotate(-2deg) scale(1.03); } 75% { transform: rotate(2deg) scale(1.03); } }
+.wiggle:not(:disabled):hover { animation: wig .5s; }
+.balloon { position: relative; display: grid; place-items: center; width: 6.5rem; height: 8rem; border-radius: 50% 50% 48% 48%;
+  font-weight: 800; color: #2b2350; box-shadow: inset -8px -8px 0 rgb(0 0 0 / .1); animation: bob 3s ease-in-out infinite; }
+.balloon::after { content: ""; position: absolute; bottom: -1.3rem; left: 50%; width: 2px; height: 1.3rem; background: #2b2350; }
+@media (prefers-reduced-motion: reduce) { .float, .bob, .drift, .sun, .grad, .balloon, .wiggle { animation: none !important; } .confetti { display: none; } }
