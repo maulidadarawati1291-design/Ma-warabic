@@ -18,7 +18,7 @@ git push -u origin main
 Di vercel.com: Add New → Project → Import repositori → Deploy.
 
 ## Alur
-Halaman masuk (nama, nomor absen, profil) → Peta Petualangan → tema → 4 game berurutan (Kamus Bergambar, Kuis Pintar, Cocokkan Kartu, Pecah Balon).
+Halaman masuk (nama, nomor absen, karakter yang bisa dihias) → Peta Petualangan → tema → 4 game berurutan (Kamus Bergambar, Kuis Pintar, Cocokkan Kartu, Pecah Balon).
 Game berikutnya terbuka jika game sebelumnya sempurna. Tema berikutnya terbuka jika 4 game tema sebelumnya sempurna.
 1 jawaban benar = 10 poin (nilai terbaik tiap game). Poin membuka profil baru (`AVATARS` di `lib/data.ts`).
 Progres tersimpan di `localStorage` per siswa (nama + nomor absen) pada perangkat yang sama.
@@ -29,3 +29,8 @@ Progres tersimpan di `localStorage` per siswa (nama + nomor absen) pada perangka
 ## Ilustrasi dan audio
 - Gambar: vektor 2D Twemoji (CC-BY 4.0) dari CDN jsDelivr (butuh internet); pemandangan tema berupa SVG di `components/Illus.tsx`.
 - Audio: suara peramban (`ar-SA`). Untuk rekaman guru, ubah `speak` di `lib/util.ts`.
+
+## Aturan
+- Keluar atau memuat ulang halaman sebelum satu tema selesai = tema itu diulang dari awal (anti-curang).
+- Game yang sudah sempurna tidak bisa dibuka ulang sampai seluruh game di tema itu selesai.
+- Kata tunjuk dan sifat mengikuti jenis kata benda (`dem`, `ADJ`, `sentOf` di `lib/data.ts`). Jenis kata dideteksi otomatis (berakhiran ة = muannats) dengan pengecualian di daftar `FEM`/`NOG`.

@@ -5,6 +5,7 @@ import { useEffect, useState, type CSSProperties } from "react";
 import { GAMES, themes } from "@/lib/data";
 import { getProfil, loadProg, perfect, points, type Profil, type Prog } from "@/lib/util";
 import { Illus } from "./Illus";
+import Avatar from "./Avatar";
 
 export default function ThemeMap() {
   const r = useRouter();
@@ -22,7 +23,7 @@ export default function ThemeMap() {
   return (
     <section className="mx-auto max-w-2xl px-4 py-8">
       <div className="card flex items-center gap-3 bg-white p-3" style={{ "--c": "#ffd23f" } as CSSProperties}>
-        <span className="bob"><Illus e={pf.avatar} size={64} /></span>
+        <span className="bob"><Avatar look={pf.avatar} size={64} /></span>
         <div>
           <p className="text-xl font-extrabold">{pf.nama}</p>
           <p className="text-sm font-bold">No. absen {pf.absen}</p>
@@ -33,7 +34,7 @@ export default function ThemeMap() {
         </div>
       </div>
       <h1 className="mt-6 text-center text-4xl font-extrabold">Peta Petualangan</h1>
-      <p className="mt-1 text-center font-bold">Selesaikan semua game dengan sempurna untuk membuka tema berikutnya.</p>
+      <p className="mt-1 text-center font-bold">Selesaikan semua game dengan sempurna untuk membuka tema berikutnya. Jika keluar sebelum satu tema selesai, tema itu diulang dari awal.</p>
       <label className="mx-auto mt-3 flex w-fit items-center gap-2 rounded-full bg-white px-4 py-1 text-sm font-bold">
         <input type="checkbox" checked={all} onChange={(e) => setAll(e.target.checked)} /> Buka semua tema (mode guru)
       </label>

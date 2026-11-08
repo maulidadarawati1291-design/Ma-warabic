@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 import type { Theme, Word } from "@/lib/data";
 import { shuffle, speak } from "@/lib/util";
 import { Confetti, Illus } from "./Illus";
-import type { Save } from "./Play1";
+import { Choice, type Nav, type Save } from "./Play1";
 
-function Done({ title, score, total, again }: { title: string; score: number; total: number; again: () => void }) {
+function Done({ title, score, total, again, nav }: { title: string; score: number; total: number; again: () => void; nav: Nav }) {
   const ok = score === total;
   return (
     <div className="card mt-6 bg-white p-6 text-center">
@@ -13,12 +13,12 @@ function Done({ title, score, total, again }: { title: string; score: number; to
       <h2 className="text-2xl font-extrabold">{title}</h2>
       <p className="text-xl font-bold">Skor {score} dari {total} (+{score * 10} poin)</p>
       <p className="my-2 font-extrabold">{ok ? "Sempurna! Game berikutnya terbuka 🔓" : "Ulangi sampai sempurna untuk membuka game berikutnya"}</p>
-      <button onClick={again} className="btn">🔁 Main lagi</button>
+      <Choice ok={ok} again={again} nav={nav} />
     </div>
   );
 }
 
-export function Match({ t, onSave }: { t: Theme; onSave: Save }) {
+export function Match({ t, onSave, nav }: { t: Theme; onSave: Save; nav: Nav }) {
   const [ws, setWs] = useState<Word[]>([]);
   const [rt, setRt] = useState<Word[]>([]);
   const [sel, setSel] = useState<string | null>(null);
@@ -27,7 +27,7 @@ export function Match({ t, onSave }: { t: Theme; onSave: Save }) {
   const [msg, setMsg] = useState("");
   const start = () => { const a = shuffle(t.words).slice(0, 6); setWs(a); setRt(shuffle(a)); setSel(null); setOk([]); setMiss(0); setMsg(""); };
   useEffect(start, []);
-  if (ws.length && ok.length === ws.length) return <Done title="🃏 Semua kartu cocok!" score={Math.max(0, ws.length - miss)} total={ws.length} again={start} />;
+  if (ws.length && ok.length === ws.length) return <Done title="🃏 Semua kartu cocok!" score={Math.max(0, ws.length - miss)} total={ws.length} again={start} nav={nav} />;
 
   function pic(w: Word) {
     if (!sel || ok.includes(w.ar)) return;
@@ -62,7 +62,7 @@ export function Match({ t, onSave }: { t: Theme; onSave: Save }) {
 
 const BC = ["#ff6b6b", "#ffb830", "#2fbf71", "#5aa0ff", "#a78bfa", "#ff5fa2"];
 
-export function Balon({ t, onSave }: { t: Theme; onSave: Save }) {
+export function Balon({ t, onSave, nav }: { t: Theme; onSave: Save; nav: Nav }) {
   const [rs, setRs] = useState<{ w: Word; o: Word[] }[]>([]);
   const [i, setI] = useState(0);
   const [pick, setPick] = useState<string | null>(null);
@@ -75,7 +75,7 @@ export function Balon({ t, onSave }: { t: Theme; onSave: Save }) {
   useEffect(start, []);
   const r = rs[i];
   useEffect(() => { if (r) speak(r.w.ar); }, [r]);
-  if (done) return <Done title="🎈 Balon selesai!" score={sc} total={rs.length} again={start} />;
+  if (done) return <Done title="🎈 Balon selesai!" score={sc} total={rs.length} again={start} nav={nav} />;
   if (!r) return null;
 
   function next() {
