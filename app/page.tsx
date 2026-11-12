@@ -30,13 +30,13 @@ export default function Masuk() {
   const can = !!nama.trim() && !!absen.trim() && need <= pts;
 
   const preview = (k: string, i: number): Look =>
-    k === "sex" ? { ...look, sex: i, hair: i ? 5 : 0, hijab: 0, outfit: 0, acc: [] } : k === "hair" ? { ...look, hair: i, hijab: 0 } : k === "acc" ? { ...look, acc: [i] } : { ...look, [k]: i };
+    k === "sex" ? { ...look, sex: i, hair: i ? 5 : 0, hijab: 0, outfit: 0, acc: [] } : k === "hair" ? { ...look, hair: i, hijab: 0 } : k === "acc" ? { ...look, acc: [i] } : ({ ...look, [k]: i } as Look);
   const on = (k: string, i: number) => k === "acc" ? look.acc.includes(i) : k === "hair" ? look.hijab === 0 && look.hair === i : look[k as keyof Look] === i;
   function choose(k: string, i: number) {
     if (k === "acc") setLook({ ...look, acc: look.acc.includes(i) ? look.acc.filter((x) => x !== i) : [...look.acc, i] });
     else if (k === "sex") setLook({ ...look, sex: i, hair: i ? 5 : 0, hijab: 0, outfit: 0, acc: look.acc.filter((a) => !ACCS[a].f || ACCS[a].f === (i ? "g" : "b")) });
     else if (k === "hair") setLook({ ...look, hair: i, hijab: 0 });
-    else setLook({ ...look, [k]: i });
+    else setLook({ ...look, [k]: i } as Look);
   }
   function go(e: React.FormEvent) {
     e.preventDefault();

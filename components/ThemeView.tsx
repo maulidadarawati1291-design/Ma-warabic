@@ -66,7 +66,7 @@ export default function ThemeView({ theme }: { theme: Theme }) {
                     <span>
                       <span className="block text-xl font-extrabold">{i + 1}. {x.n}</span>
                       <span className="block text-sm font-bold">
-                        {done ? (complete ? "✔ Selesai · boleh berlatih lagi" : `✔ Selesai · nilai ${res?.score}/${res?.total}`) : res ? `Terbaik ${res.score}/${res.total}` : open(i) ? "Ayo main!" : "Selesaikan game sebelumnya dulu"}
+                        {done ? (complete ? "✔ Selesai · boleh berlatih lagi" : `✔ Selesai · nilai ${res?.score}/${res?.total}`) : open(i) ? "Ayo main!" : "Selesaikan game sebelumnya dulu"}
                       </span>
                     </span>
                   </button>
