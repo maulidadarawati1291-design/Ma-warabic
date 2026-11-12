@@ -3,10 +3,12 @@ import Link from "next/link";
 import { useEffect, useState, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import { GAMES, type Theme } from "@/lib/data";
-import { getProfil, loadProg, perfect, resetIncomplete, saveRes, type Prog, type Res } from "@/lib/util";
+import { getProfil, loadProg, finished, resetIncomplete, saveRes, type Prog, type Res } from "@/lib/util";
 import { Scene } from "./Illus";
 import { Kamus, Quiz, type Nav } from "./Play1";
 import { Balon, Match } from "./Play2";
+
+const GB = ["linear-gradient(135deg,#fff3c4,#ffd9a0)", "linear-gradient(135deg,#e6dcff,#cbbaff)", "linear-gradient(135deg,#b8f2e6,#d9f0ff)", "linear-gradient(135deg,#8fd3ff,#d8f3ff)"];
 
 export default function ThemeView({ theme }: { theme: Theme }) {
   const r = useRouter();
@@ -25,13 +27,13 @@ export default function ThemeView({ theme }: { theme: Theme }) {
   if (!ready) return null;
 
   const mine = prog[theme.slug] ?? {};
-  const complete = GAMES.every((x) => perfect(mine[x.id]));
+  const complete = GAMES.every((x) => finished(mine[x.id]));
   const save = (game: string, res: Res) => { saveRes(theme.slug, game, res); setProg(loadProg()); };
-  const open = (i: number) => i === 0 || perfect(mine[GAMES[i - 1].id]);
+  const open = (i: number) => i === 0 || finished(mine[GAMES[i - 1].id]);
   const gi = GAMES.findIndex((x) => x.id === g);
   const nav: Nav = {
     next: () => setG(GAMES[gi + 1]?.id ?? null),
-    canAgain: complete || !perfect(mine[g ?? ""]),
+    canAgain: complete || !finished(mine[g ?? ""]),
     last: gi === GAMES.length - 1,
   };
 
@@ -50,21 +52,21 @@ export default function ThemeView({ theme }: { theme: Theme }) {
               <Link href="/peta" className="btn mt-2">🗺️ Lanjut ke Peta</Link>
             </div>
           ) : (
-            <p className="mt-5 rounded-2xl bg-white/80 p-3 text-center font-bold">⚠️ Selesaikan semua game tanpa keluar dari halaman ini. Jika keluar atau memuat ulang, tema diulang dari awal.</p>
+            <p className="mt-5 rounded-2xl bg-white/80 p-3 text-center font-bold">⚠️ Selesaikan semua game tanpa keluar dari halaman ini. Jika keluar atau memuat ulang, tema diulang dari awal. Tiap game hanya dimainkan sekali agar nilainya valid.</p>
           )}
           <ol className="mt-5 grid gap-4 sm:grid-cols-2">
             {GAMES.map((x, i) => {
               const res = mine[x.id];
-              const done = perfect(res);
+              const done = finished(res);
               const can = complete || (open(i) && !done);
               return (
                 <li key={x.id}>
-                  <button disabled={!can} onClick={() => setG(x.id)} className="card wiggle flex w-full items-center gap-3 p-4 text-left disabled:opacity-60 disabled:grayscale" style={{ background: theme.bg }}>
+                  <button disabled={!can} onClick={() => setG(x.id)} className="card wiggle flex w-full items-center gap-3 p-4 text-left disabled:opacity-60 disabled:grayscale" style={{ background: GB[i] }}>
                     <span className="text-4xl">{can ? x.e : done ? "✅" : "🔒"}</span>
                     <span>
                       <span className="block text-xl font-extrabold">{i + 1}. {x.n}</span>
                       <span className="block text-sm font-bold">
-                        {done ? (complete ? "✔ Sempurna! Boleh berlatih lagi" : "✔ Selesai") : res ? `Terbaik ${res.score}/${res.total}` : open(i) ? "Ayo main!" : "Selesaikan game sebelumnya dengan sempurna"}
+                        {done ? (complete ? "✔ Selesai · boleh berlatih lagi" : `✔ Selesai · nilai ${res?.score}/${res?.total}`) : res ? `Terbaik ${res.score}/${res.total}` : open(i) ? "Ayo main!" : "Selesaikan game sebelumnya dulu"}
                       </span>
                     </span>
                   </button>

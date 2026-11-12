@@ -34,3 +34,7 @@ Progres tersimpan di `localStorage` per siswa (nama + nomor absen) pada perangka
 - Keluar atau memuat ulang halaman sebelum satu tema selesai = tema itu diulang dari awal (anti-curang).
 - Game yang sudah sempurna tidak bisa dibuka ulang sampai seluruh game di tema itu selesai.
 - Kata tunjuk dan sifat mengikuti jenis kata benda (`dem`, `ADJ`, `sentOf` di `lib/data.ts`). Jenis kata dideteksi otomatis (berakhiran ة = muannats) dengan pengecualian di daftar `FEM`/`NOG`.
+
+## Penilaian
+Game berikutnya terbuka setelah game sebelumnya selesai (tidak harus sempurna). Setelah tiap game selesai, siswa melihat nilai dan koreksi jawaban yang salah. Soal diacak dengan tiga tingkat: Mudah, Sedang, Sulit.
+Suara mengikuti jenis karakter (perempuan atau laki-laki). Efek suara sorak dan "tet-tot" dibuat dengan WebAudio.

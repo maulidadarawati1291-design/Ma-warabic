@@ -11,19 +11,39 @@ export function Illus({ e, size = 64 }: { e: string; size?: number }) {
   return <img src={src(e)} width={size} height={size} alt="" loading="lazy" className="inline-block object-contain" />;
 }
 
-// Pemandangan 2D per tema: langit, matahari, awan, bukit, dan tiga kosakata tema.
+const SPOTS = [[40, 125, 84], [135, 100, 104], [250, 62, 130], [385, 100, 104], [480, 125, 84]];
+const HILLS = [
+  "M0 170 Q150 110 300 160 T600 150 V240 H0Z",
+  "M0 190 L90 120 L170 175 L260 100 L360 180 L450 125 L540 175 L600 140 V240 H0Z",
+  "M0 190 Q50 130 100 190 T200 190 T300 190 T400 190 T500 190 T600 190 V240 H0Z",
+];
+
+// Diorama 2D per tema: langit gradasi, lambang tema transparan, bukit (bentuk berbeda tiap tema), dan lima benda berbayang yang berdiri di tanah.
 export function Scene({ t }: { t: Theme }) {
   return (
-    <svg viewBox="0 0 600 220" className="w-full rounded-3xl border-4 border-white shadow-md" role="img" aria-label={`Ilustrasi tema ${t.id}`}>
-      <rect width="600" height="220" fill={t.bg} />
-      <circle className="sun" cx="530" cy="52" r="30" fill="#ffd23f" />
-      <g className="drift"><ellipse cx="110" cy="48" rx="55" ry="17" fill="#fff" /><ellipse cx="150" cy="60" rx="45" ry="15" fill="#fff" /></g>
-      <ellipse className="drift" cx="370" cy="38" rx="45" ry="14" fill="#fff" />
-      <path d="M0 165 Q150 105 300 155 T600 145 V220 H0Z" fill={t.c} />
-      <path d="M0 200 Q200 160 400 195 T600 185 V220 H0Z" fill="#3fb86a" />
-      {t.words.slice(0, 3).map((w, i) => (
-        <image className="bob" style={{ animationDelay: `${i * 0.5}s` }} key={w.ar} href={src(w.e)} x={95 + i * 170} y={65 + (i % 2) * 28} width="115" height="115" />
-      ))}
+    <svg viewBox="0 0 600 240" className="w-full rounded-3xl border-4 border-white shadow-md" role="img" aria-label={`Ilustrasi tema ${t.id}`}>
+      <defs>
+        <linearGradient id="scg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={t.bg} /><stop offset="1" stopColor="#fff" /></linearGradient>
+      </defs>
+      <rect width="600" height="240" fill="url(#scg)" />
+      <image href={src(t.e)} x="205" y="-25" width="200" height="200" opacity=".13" />
+      <circle className="sun" cx="540" cy="50" r="28" fill="#ffd23f" />
+      <g className="drift" fill="#fff"><ellipse cx="100" cy="46" rx="52" ry="15" /><ellipse cx="140" cy="58" rx="40" ry="13" /></g>
+      <ellipse className="drift" cx="400" cy="34" rx="44" ry="13" fill="#fff" />
+      {[[70, 30], [330, 60], [560, 110], [30, 90], [450, 20]].map(([x, y], i) => <text key={i} className="twinkle" style={{ animationDelay: `${i * 0.4}s` }} x={x} y={y} fontSize="18" fill={t.c}>✦</text>)}
+      <path d={HILLS[t.slug.length % 3]} fill={t.c} opacity=".45" />
+      <path d="M0 205 Q150 160 320 200 T600 190 V240 H0Z" fill={t.c} />
+      <path d="M0 222 Q200 192 400 220 T600 212 V240 H0Z" fill="#3fb86a" />
+      {t.words.slice(0, 5).map((w, i) => {
+        const [x, y, s] = SPOTS[i];
+        return (
+          <g key={w.ar}>
+            <ellipse cx={x + s / 2} cy={y + s - 2} rx={s * 0.4} ry="7" fill="#000" opacity=".18" />
+            <circle cx={x + s / 2} cy={y + s / 2} r={s * 0.58} fill="#fff" opacity=".35" />
+            <image className="bob" style={{ animationDelay: `${i * 0.4}s`, filter: "drop-shadow(0 4px 3px rgba(0,0,0,.25))" }} href={src(w.e)} x={x} y={y} width={s} height={s} />
+          </g>
+        );
+      })}
     </svg>
   );
 }

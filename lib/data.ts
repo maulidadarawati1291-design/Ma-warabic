@@ -241,3 +241,52 @@ export const ACCS: Opt[] = [
   { n: "Bando", min: 0, f: "g" }, { n: "Pita", min: 50, f: "g" }, { n: "Jepit Bintang", min: 150, f: "g" }, { n: "Syal", min: 200 }, { n: "Mahkota", min: 600 },
 ];
 export const MOODS: Opt[] = [{ n: "Senang", min: 0 }, { n: "Semangat", min: 0 }, { n: "Keren", min: 200 }, { n: "Jahil", min: 300 }];
+
+// Info kaidah bahasa Arab yang berkaitan dengan tiap tema (ditampilkan di Kamus Bergambar).
+export const TIPS: Record<string, { h: string; p: string }[]> = {
+  "anggota-tubuh": [
+    { h: "Muannats bukan hanya yang berakhiran ة", p: "Kata benda muannats ada 3 macam. (1) Berakhiran ة (ta marbuthah): رُكْبَةٌ، عَضَلَةٌ. (2) Bermakna perempuan walau tanpa ة: أُمٌّ (ibu), بِنْتٌ (anak perempuan). (3) Muannats menurut kebiasaan orang Arab, terutama anggota tubuh yang berpasangan: عَيْنٌ، أُذُنٌ، يَدٌ، رِجْلٌ، قَدَمٌ، سِنٌّ. Jadi yang benar هَذِهِ يَدٌ." },
+    { h: "Anggota tubuh yang mudzakkar", p: "Tidak semua anggota tubuh muannats. Yang mudzakkar: رَأْسٌ، أَنْفٌ، فَمٌ، وَجْهٌ، قَلْبٌ، شَعْرٌ، لِسَانٌ. Jadi yang benar هَذَا أَنْفٌ." },
+    { h: "Bentuk berpasangan (mutsanna)", p: "Untuk dua benda tambahkan ـَانِ: يَدٌ menjadi يَدَانِ، عَيْنٌ menjadi عَيْنَانِ، أُذُنٌ menjadi أُذُنَانِ. Pada posisi nashab dan jar, ـَانِ berubah menjadi ـَيْنِ: يَدَيْنِ، عَيْنَيْنِ." },
+  ],
+  "kebun-binatang": [
+    { h: "Sifat mengikuti kata benda", p: "Kata sifat harus sama jenisnya dengan kata benda: أَسَدٌ كَبِيرٌ (singa besar), زَرَافَةٌ كَبِيرَةٌ (jerapah besar)." },
+    { h: "Jamak hewan dianggap muannats tunggal", p: "Jamak dari hewan dan benda diperlakukan seperti muannats tunggal, jadi memakai هَذِهِ dan sifat berakhiran ة: هَذِهِ حَيَوَانَاتٌ كَبِيرَةٌ (ini hewan-hewan besar)." },
+    { h: "Huruf jar فِي", p: "Setelah فِي, kata benda berharakat kasrah: فِي حَدِيقَةِ الْحَيَوَانَاتِ (di kebun binatang). حَدِيقَةُ الْحَيَوَانَاتِ adalah susunan idhafah: kebun milik hewan-hewan." },
+  ],
+  "ruang-tamu-belajar": [
+    { h: "Nama alat berawalan مِـ", p: "Banyak nama alat berawalan مِـ: مِفْتَاحٌ (kunci), مِصْبَاحٌ (lampu), مِسْطَرَةٌ (penggaris), مِكْنَسَةٌ (sapu), مِقَصٌّ (gunting)." },
+    { h: "Menyebut letak benda", p: "Kata sesudah huruf jar berharakat kasrah: عَلَى (di atas), فِي (di dalam), تَحْتَ (di bawah). Contoh: الْكِتَابُ عَلَى الطَّاوِلَةِ، الْقَلَمُ فِي الْحَقِيبَةِ." },
+    { h: "Fungsi alif lam (الـ)", p: "Tanpa الـ, kata bersifat umum dan bertanwin: كِتَابٌ (sebuah buku). Dengan الـ menjadi tertentu dan tanwin hilang: الْكِتَابُ (buku itu)." },
+  ],
+  "perpustakaan": [
+    { h: "Nama tempat berawalan مَـ", p: "Banyak kata tempat berawalan مَـ: مَكْتَبَةٌ (perpustakaan), مَدْرَسَةٌ (sekolah), مَطْعَمٌ (restoran), مَلْعَبٌ (lapangan)." },
+    { h: "Pasangan laki-laki dan perempuan", p: "Untuk pelaku perempuan tambahkan ة: مُعَلِّمٌ menjadi مُعَلِّمَةٌ (guru), طَالِبٌ menjadi طَالِبَةٌ (siswa). Contoh: هَذَا مُعَلِّمٌ، هَذِهِ مُعَلِّمَةٌ." },
+    { h: "Kata tanya", p: "مَا untuk benda, مَنْ untuk orang, أَيْنَ untuk tempat. Contoh: مَا هَذَا؟ هَذَا كِتَابٌ. مَنْ هَذِهِ؟ هَذِهِ مُعَلِّمَةٌ. أَيْنَ الْكِتَابُ؟" },
+  ],
+  "kantin": [
+    { h: "Meminta sesuatu", p: "Setelah أُرِيدُ (saya ingin), benda yang diinginkan berakhiran fathah atau tanwin fathah: أُرِيدُ مَاءً، أُرِيدُ خُبْزًا، أُرِيدُ عَصِيرًا." },
+    { h: "Bentuk kolektif dan satuan", p: "Nama buah dan sayur biasanya bentuk kolektif (mudzakkar). Untuk satuannya tambahkan ة (muannats): تُفَّاحٌ menjadi تُفَّاحَةٌ (sebuah apel), مَوْزٌ menjadi مَوْزَةٌ (sebuah pisang), بَيْضٌ menjadi بَيْضَةٌ (sebutir telur)." },
+    { h: "Makan dan minum", p: "آكُلُ berarti saya makan, أَشْرَبُ berarti saya minum. Awalan أ pada kata kerja berarti saya: آكُلُ خُبْزًا، أَشْرَبُ مَاءً." },
+  ],
+  "jam-waktu": [
+    { h: "Menyebut jam", p: "سَاعَةٌ muannats, jadi angka urutnya juga muannats: السَّاعَةُ الْوَاحِدَةُ (jam 1), الثَّانِيَةُ (jam 2), الثَّالِثَةُ (jam 3), sampai السَّابِعَةُ (jam 7). Tanya: كَمِ السَّاعَةُ؟ Jawab: السَّاعَةُ السَّابِعَةُ." },
+    { h: "Setengah dan seperempat", p: "السَّابِعَةُ وَالنِّصْفُ berarti 07.30. السَّابِعَةُ وَالرُّبْعُ berarti 07.15. السَّابِعَةُ إِلَّا رُبْعًا berarti 06.45." },
+    { h: "Keterangan waktu dan jenis kata", p: "Kata waktu seperti صَبَاحًا، ظُهْرًا، مَسَاءً، غَدًا berakhiran tanwin fathah. Hari, pekan, dan bulan mudzakkar: يَوْمٌ، أُسْبُوعٌ، شَهْرٌ. Tahun dan menit muannats: سَنَةٌ، دَقِيقَةٌ." },
+  ],
+  "saya-suka-bahasa-arab": [
+    { h: "Awalan kata kerja", p: "Kata kerja masa kini berawalan أَ/أُ/آ berarti saya: أَقْرَأُ، أَكْتُبُ، آكُلُ. Awalan نَـ berarti kami: نَقْرَأُ. Bentuk untuk saya sama untuk laki-laki dan perempuan." },
+    { h: "Menyebut yang disuka", p: "Benda yang disukai berakhiran fathah: أُحِبُّ الْقِرَاءَةَ (saya suka membaca), أَنَا أُحِبُّ اللُّغَةَ الْعَرَبِيَّةَ. Kata أَنَا (saya) boleh dihilangkan." },
+    { h: "Sifat mengikuti jenis kata", p: "اللُّغَةُ muannats, jadi sifatnya muannats: اللُّغَةُ الْعَرَبِيَّةُ. Bandingkan dengan mudzakkar: الْكِتَابُ الْعَرَبِيُّ." },
+  ],
+  "kegiatan-liburan": [
+    { h: "Huruf jar", p: "إِلَى berarti ke, مَعَ berarti bersama, بِـ berarti dengan atau naik. Contoh: أَذْهَبُ إِلَى الْحَدِيقَةِ، أَلْعَبُ مَعَ أَصْدِقَائِي، أُسَافِرُ بِالْقِطَارِ." },
+    { h: "Menyatakan kepemilikan", p: "Tambahkan akhiran: ـِي (milikku), ـكَ (milikmu, laki-laki), ـكِ (milikmu, perempuan), ـهُ (miliknya, laki-laki), ـهَا (miliknya, perempuan). Contoh: كِتَابِي، كِتَابُكَ، كِتَابُكِ، كِتَابُهُ، كِتَابُهَا." },
+    { h: "Alat transportasi", p: "قِطَارٌ mudzakkar, sedangkan سَيَّارَةٌ، طَائِرَةٌ، سَفِينَةٌ، دَرَّاجَةٌ muannats: هَذَا قِطَارٌ، هَذِهِ سَيَّارَةٌ." },
+  ],
+  "piknik": [
+    { h: "Benda alam yang muannats", p: "Beberapa benda alam muannats menurut kebiasaan walau tanpa ة: شَمْسٌ (matahari), سَمَاءٌ (langit). Sedangkan قَمَرٌ، نَهْرٌ، مَطَرٌ mudzakkar. Contoh: الشَّمْسُ جَمِيلَةٌ." },
+    { h: "Jamak manusia dan bukan manusia", p: "Untuk banyak orang pakai هَؤُلَاءِ: هَؤُلَاءِ أَصْدِقَاءُ. Untuk jamak benda atau hewan pakai هَذِهِ: هَذِهِ أَزْهَارٌ." },
+    { h: "Mengajak", p: "لِنَذْهَبْ berarti mari kita pergi (kata kerja bersukun setelah لِـ): لِنَذْهَبْ إِلَى الْحَدِيقَةِ. Bisa juga هَيَّا بِنَا نَذْهَبْ." },
+  ],
+};

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Baloo_2, Noto_Naskh_Arabic } from "next/font/google";
 import Bg from "@/components/Bg";
+import Feedback from "@/components/Feedback";
 import "./globals.css";
 
 const sans = Baloo_2({ subsets: ["latin"], weight: ["500", "700", "800"], variable: "--font-baloo" });
@@ -16,6 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="id" className={`${sans.variable} ${arab.variable}`}>
       <body className="font-sans min-h-screen">
         <Bg />
+        <Feedback />
         <div className="relative z-10">{children}</div>
         <footer className="relative z-10 px-4 pb-6 text-center text-xs font-semibold">
           Ilustrasi kata: Twemoji © Twitter, Inc. dan kontributor, lisensi CC-BY 4.0.

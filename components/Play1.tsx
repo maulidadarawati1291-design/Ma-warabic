@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, type CSSProperties } from "react";
-import { ADJ, dem, sentOf, type Theme, type Word } from "@/lib/data";
-import { shuffle, speak, type Res } from "@/lib/util";
+import { ADJ, TIPS, dem, sentOf, type Theme, type Word } from "@/lib/data";
+import { reaksi, shuffle, speak, type Res } from "@/lib/util";
 import { Confetti, Illus } from "./Illus";
 
 export type Save = (g: string, r: Res) => void;
@@ -9,6 +9,22 @@ export type Nav = { next: () => void; canAgain: boolean; last: boolean };
 
 function Sound({ text, label = "Dengarkan" }: { text: string; label?: string }) {
   return <button onClick={() => speak(text)} className="btn">🔊 {label}</button>;
+}
+
+// Teks Indonesia bercampur Arab: bagian Arab ditampilkan dengan font Arab.
+export function Rich({ s }: { s: string }) {
+  return <>{s.split(/([\u0600-\u06FF][\u0600-\u06FF\s،؟]*[\u0600-\u06FF؟]|[\u0600-\u06FF])/).map((x, i) => (i % 2 ? <span key={i} className="arab inline-block text-xl font-extrabold">{x}</span> : x))}</>;
+}
+
+export function Koreksi({ items }: { items: string[] }) {
+  if (!items.length) return null;
+  return (
+    <div className="mt-4 rounded-2xl bg-white/80 p-4 text-left">
+      <p className="text-center text-lg font-extrabold">📝 Koreksi jawabanmu</p>
+      <p className="text-center text-sm font-bold">Pelajari lagi ya, semangat!</p>
+      <ul className="mt-2 grid gap-2">{items.map((x) => <li key={x} className="rounded-xl bg-white p-2 font-bold"><Rich s={x} /></li>)}</ul>
+    </div>
+  );
 }
 
 // Dua pilihan setelah satu permainan selesai.
@@ -19,7 +35,7 @@ export function Choice({ ok, again, nav }: { ok: boolean; again: () => void; nav
         <button className="btn" disabled={ok && !nav.canAgain} onClick={again}>🔁 Mulai permainan</button>
         <button className="btn" disabled={!ok} onClick={nav.next} style={{ "--c": "#ffd23f" } as CSSProperties}>{nav.last ? "🏆 Selesai" : "▶ Lanjut permainan"}</button>
       </div>
-      {ok && !nav.canAgain && <p className="mt-2 text-sm font-bold">Permainan yang sudah sempurna baru bisa diulang setelah seluruh game di tema ini selesai.</p>}
+      {ok && !nav.canAgain && <p className="mt-2 text-sm font-bold">Tiap game hanya dimainkan sekali agar nilainya valid. Bisa diulang setelah seluruh game di tema ini selesai.</p>}
     </div>
   );
 }
@@ -30,6 +46,7 @@ export function Kamus({ t, onSave, nav }: { t: Theme; onSave: Save; nav: Nav }) 
   const [seen, setSeen] = useState<string[]>([]);
   const list = t.words.filter((w) => w.id.toLowerCase().includes(q.toLowerCase()) || w.ar.includes(q));
   const all = seen.length === t.words.length;
+  const tips = TIPS[t.slug] ?? [];
   function tap(w: Word) {
     speak(w.ar);
     setOpen(open === w.ar ? null : w.ar);
@@ -69,10 +86,23 @@ export function Kamus({ t, onSave, nav }: { t: Theme; onSave: Save; nav: Nav }) 
         ))}
       </div>
       {!list.length && <p className="mt-6 text-center font-bold">Kata tidak ditemukan. Coba kata lain.</p>}
+      {tips.length > 0 && (
+        <div className="card mt-8 bg-white p-5">
+          <p className="text-center text-xl font-extrabold">💡 Info Bahasa Arab</p>
+          <ul className="mt-3 grid gap-3">
+            {tips.map((x, i) => (
+              <li key={x.h} className="rounded-2xl p-3" style={{ background: t.bg }}>
+                <p className="font-extrabold">{i + 1}. {x.h}</p>
+                <p className="mt-1 font-semibold leading-relaxed"><Rich s={x.p} /></p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       {t.words.some((w) => w.g) && (
-        <div className="card mt-8 bg-white p-4 text-center">
-          <p className="text-lg font-extrabold">💡 Aturan kata tunjuk</p>
-          <p className="font-bold"><span className="arab text-xl">هَذَا</span> untuk benda mudzakkar (laki-laki), <span className="arab text-xl">هَذِهِ</span> untuk benda muannats (perempuan). Kata benda berakhiran <span className="arab text-xl">ة</span> biasanya muannats. Sifat juga mengikuti: <span className="arab text-xl">كَبِيرٌ</span> → <span className="arab text-xl">كَبِيرَةٌ</span>. Pengecualian: <span className="arab text-xl">عَيْنٌ، يَدٌ، شَمْسٌ</span> tetap muannats.</p>
+        <div className="card mt-6 bg-white p-4 text-center">
+          <p className="text-lg font-extrabold">📘 Ingat: kata tunjuk</p>
+          <p className="font-bold"><Rich s="هَذَا untuk benda mudzakkar (laki-laki), هَذِهِ untuk benda muannats (perempuan). Sifat juga mengikuti: كَبِيرٌ menjadi كَبِيرَةٌ." /></p>
         </div>
       )}
       <div className="card mt-6 bg-white p-5 text-center">
@@ -95,35 +125,40 @@ export function Kamus({ t, onSave, nav }: { t: Theme; onSave: Save; nav: Nav }) 
   );
 }
 
-type Q = { t: "arti" | "gambar" | "arab" | "bs" | "gen" | "sfat" | "susun"; w: Word; x?: Word; opts: string[]; ans: string; rev: string; toks?: string[]; hint?: string };
+type T = "gambar" | "bs" | "arti" | "arab" | "gen" | "dengar" | "sfat" | "susun";
+type Q = { t: T; lv: 1 | 2 | 3; w: Word; x?: Word; opts: string[]; ans: string; rev: string; toks?: string[]; hint?: string };
+// Tingkat kesulitan: 1 mudah, 2 sedang, 3 sulit. Soal diacak urutannya.
+const LV: Record<T, 1 | 2 | 3> = { gambar: 1, bs: 1, arti: 2, arab: 2, gen: 2, dengar: 3, sfat: 3, susun: 3 };
+const LB = ["Mudah", "Sedang", "Sulit"];
 
 function build(t: Theme): Q[] {
   const ws = shuffle(t.words);
   const gw = ws.filter((w) => w.g);
   const used = new Set<string>();
   const take = (src: Word[]) => { const w = src.find((x) => !used.has(x.ar)) ?? ws.find((x) => !used.has(x.ar))!; used.add(w.ar); return w; };
-  const types = shuffle(["arti", "gambar", "arab", "bs", "gen", "sfat", "arti", "gambar", "arab"] as Q["t"][]);
-  const qs: Q[] = types.map((ty) => {
-    const w = take(ty === "gen" || ty === "sfat" ? gw : ws);
+  const plan = shuffle(["gambar", "bs", "gambar", "arti", "arab", "gen", "arti", "dengar", "sfat"] as T[]);
+  const qs: Q[] = plan.map((ty0) => {
+    const w = take(ty0 === "gen" || ty0 === "sfat" ? gw : ws);
+    const ty: T = (ty0 === "gen" || ty0 === "sfat") && !w.g ? (ty0 === "gen" ? "arti" : "dengar") : ty0;
+    const lv = LV[ty];
     const others = shuffle(t.words.filter((x) => x.ar !== w.ar));
     const rev = `${w.ar} = ${w.id}`;
     if (ty === "bs") {
       const x = Math.random() < 0.5 ? w : others[0];
-      return { t: ty, w, x, opts: ["ya", "tidak"], ans: x.ar === w.ar ? "ya" : "tidak", rev };
+      return { t: ty, lv, w, x, opts: ["ya", "tidak"], ans: x.ar === w.ar ? "ya" : "tidak", rev };
     }
-    if (w.g && ty === "gen") {
-      return { t: ty, w, opts: ["هَذَا", "هَذِهِ"], ans: dem(w), rev: `${dem(w)} ${w.ar} = Ini ${w.id.toLowerCase()}. ${w.ar} termasuk ${w.g === "f" ? "muannats, maka memakai هَذِهِ" : "mudzakkar, maka memakai هَذَا"}.` };
+    if (ty === "gen") {
+      return { t: ty, lv, w, opts: ["هَذَا", "هَذِهِ"], ans: dem(w), rev: `${dem(w)} ${w.ar} = Ini ${w.id.toLowerCase()}. ${w.ar} termasuk ${w.g === "f" ? "muannats, maka memakai هَذِهِ" : "mudzakkar, maka memakai هَذَا"}.` };
     }
-    if (w.g && ty === "sfat") {
+    if (ty === "sfat") {
       const a = ADJ[Math.floor(Math.random() * ADJ.length)];
       const ans = w.g === "f" ? a[1] : a[0];
-      return { t: ty, w, opts: shuffle([a[0], a[1]]), ans, rev: `${dem(w)} ${w.ar} ${ans} = Ini ${w.id.toLowerCase()} ${a[2]}. Sifat mengikuti jenis kata bendanya.` };
+      return { t: ty, lv, w, opts: shuffle([a[0], a[1]]), ans, rev: `${dem(w)} ${w.ar} ${ans} = Ini ${w.id.toLowerCase()} ${a[2]}. Sifat mengikuti jenis kata bendanya.` };
     }
-    const t2: Q["t"] = ty === "gen" || ty === "sfat" ? "arti" : ty;
-    return { t: t2, w, opts: shuffle([w, ...others.slice(0, 3)]).map((o) => o.ar), ans: w.ar, rev };
+    return { t: ty, lv, w, opts: shuffle([w, ...others.slice(0, 3)]).map((o) => o.ar), ans: w.ar, rev };
   });
   const s = gw.length ? sentOf(gw[Math.floor(Math.random() * gw.length)], true) : shuffle(t.ex)[0];
-  qs.push({ t: "susun", w: ws[0], opts: [], ans: s.ar, rev: `${s.ar} = ${s.id}`, toks: shuffle(s.ar.split(" ")), hint: s.id });
+  qs.push({ t: "susun", lv: 3, w: ws[0], opts: [], ans: s.ar, rev: `${s.ar} = ${s.id}`, toks: shuffle(s.ar.split(" ")), hint: s.id });
   return shuffle(qs);
 }
 
@@ -139,11 +174,12 @@ export function Quiz({ t, onSave, nav }: { t: Theme; onSave: Save; nav: Nav }) {
   const byAr = (a: string) => t.words.find((x) => x.ar === a)!;
 
   function start() { setQs(build(t)); setI(0); setPick(null); setBuilt([]); setScore(0); setWrong([]); setDone(false); }
-  useEffect(() => { if (q?.t === "gambar") speak(q.w.ar); }, [q]);
+  useEffect(() => { if (q?.t === "gambar" || q?.t === "dengar") speak(q.w.ar); }, [q]);
 
   function choose(k: string) {
     if (pick !== null) return;
     setPick(k);
+    reaksi(k === q.ans);
     if (k === q.ans) setScore(score + 1); else setWrong([...wrong, q.rev]);
   }
   function next() {
@@ -154,27 +190,23 @@ export function Quiz({ t, onSave, nav }: { t: Theme; onSave: Save; nav: Nav }) {
 
   if (!qs.length) {
     return (
-      <div className="card mt-6 bg-white p-6 text-center">
-        <p className="text-xl font-extrabold">Kuis 10 soal, tiap main soalnya berbeda!</p>
-        <p className="mb-4">Ada tebak arti, tebak gambar, kata Arab, benar-salah, kata tunjuk, sifat, dan menyusun kalimat.</p>
+      <div className="panel lv2 mt-6 p-6 text-center">
+        <p className="text-xl font-extrabold">Kuis 10 soal dengan tingkat Mudah, Sedang, dan Sulit, diacak!</p>
+        <p className="mb-4 font-semibold">Tiap soal hanya dikerjakan sekali agar nilainya valid. Setelah selesai, kamu akan melihat koreksinya.</p>
         <button onClick={start} className="btn text-xl">▶ Mulai Kuis</button>
       </div>
     );
   }
 
   if (done) {
-    const perfect = score === qs.length;
     return (
-      <div className="card mt-6 bg-white p-6 text-center">
-        {perfect && <Confetti />}
-        <h2 className="text-2xl font-extrabold">Keren! Misimu selesai</h2>
-        <p className="my-2 text-2xl font-extrabold">{perfect ? "Sempurna! Game berikutnya terbuka 🔓" : "Ayo ulangi sampai 10 dari 10 untuk membuka game berikutnya"}</p>
+      <div className="panel lv3 mt-6 p-6 text-center">
+        {score === qs.length && <Confetti />}
+        <h2 className="text-2xl font-extrabold">Misimu selesai!</h2>
+        <p className="my-2 text-xl font-extrabold">{score === qs.length ? "Sempurna! 🎉" : "Game berikutnya terbuka 🔓"}</p>
         <p className="text-xl font-bold">Skor {score} dari {qs.length} (+{score * 10} poin)</p>
-        {wrong.length > 0 && (
-          <div className="mt-4"><p className="font-bold">Yang perlu dilatih:</p>
-            {wrong.map((x) => <p key={x} className="text-lg font-bold">{x}</p>)}</div>
-        )}
-        <Choice ok={perfect} again={start} nav={nav} />
+        <Koreksi items={wrong} />
+        <Choice ok again={start} nav={nav} />
       </div>
     );
   }
@@ -182,11 +214,12 @@ export function Quiz({ t, onSave, nav }: { t: Theme; onSave: Save; nav: Nav }) {
   const oc = (k: string) => pick === null ? "bg-white" : k === q.ans ? "bg-green-300" : k === pick ? "bg-red-200" : "bg-white opacity-50";
   const opt = "rounded-2xl p-3 text-xl font-extrabold shadow-[0_4px_0_rgba(0,0,0,.15)] ";
   return (
-    <div className="card mt-6 p-5 text-center" style={{ background: t.bg }}>
+    <div className={`panel lv${q.lv} mt-6 p-5 text-center`}>
       <div className="mb-3 h-3 rounded-full bg-white"><div className="h-3 rounded-full" style={{ width: `${(i / qs.length) * 100}%`, background: t.c }} /></div>
-      <p className="font-bold">Soal {i + 1} dari {qs.length}</p>
+      <p className="font-bold">Soal {i + 1} dari {qs.length} <span className="ml-2 rounded-full bg-white px-3 py-0.5 text-sm">{"⭐".repeat(q.lv)} {LB[q.lv - 1]}</span></p>
       {q.t === "arti" && <div className="my-3"><p className="font-bold">Apa arti kata ini?</p><p className="arab text-5xl font-extrabold">{q.w.ar}</p></div>}
       {q.t === "gambar" && <div className="my-3"><p className="mb-2 font-bold">Dengarkan, lalu pilih gambarnya:</p><Sound text={q.w.ar} label="Putar lagi" /></div>}
+      {q.t === "dengar" && <div className="my-3"><p className="mb-2 font-bold">Dengarkan, lalu pilih artinya (tanpa gambar):</p><Sound text={q.w.ar} label="Putar lagi" /></div>}
       {q.t === "arab" && <div className="my-3"><p className="font-bold">Pilih kata Arab untuk gambar ini:</p><Illus e={q.w.e} size={96} /><p className="text-2xl font-extrabold">{q.w.id}</p></div>}
       {q.t === "bs" && <div className="my-3"><p className="font-bold">Cocokkah gambar dan katanya?</p><Illus e={q.w.e} size={96} /><p className="arab text-4xl font-extrabold">{q.x!.ar}</p></div>}
       {q.t === "gen" && <div className="my-3"><p className="font-bold">Pilih kata tunjuk yang tepat:</p><Illus e={q.w.e} size={96} /><p className="arab text-4xl font-extrabold">_____ {q.w.ar}</p></div>}
@@ -206,14 +239,14 @@ export function Quiz({ t, onSave, nav }: { t: Theme; onSave: Save; nav: Nav }) {
         <div className="grid grid-cols-2 gap-3">
           {q.opts.map((k) => (
             <button key={k} onClick={() => choose(k)} className={opt + oc(k)}>
-              {q.t === "arti" ? byAr(k).id : q.t === "gambar" ? <Illus e={byAr(k).e} size={72} /> : q.t === "bs" ? (k === "ya" ? "✔ Benar" : "✘ Salah") : <span className="arab text-2xl">{k}</span>}
+              {q.t === "arti" || q.t === "dengar" ? byAr(k).id : q.t === "gambar" ? <Illus e={byAr(k).e} size={72} /> : q.t === "bs" ? (k === "ya" ? "✔ Benar" : "✘ Salah") : <span className="arab text-2xl">{k}</span>}
             </button>
           ))}
         </div>
       )}
       {pick !== null && (
         <div className="pop mt-4">
-          <p className="text-xl font-extrabold">{pick === q.ans ? "Benar, hebat! 🎉" : `Hampir! Jawabannya: ${q.rev}`}</p>
+          <p className="text-xl font-extrabold">{pick === q.ans ? "Benar, hebat! 🎉" : <>😢 Hampir! Jawabannya: <Rich s={q.rev} /></>}</p>
           <button onClick={next} className="btn mt-3">{i + 1 < qs.length ? "Lanjut ▶" : "Lihat hasil"}</button>
         </div>
       )}

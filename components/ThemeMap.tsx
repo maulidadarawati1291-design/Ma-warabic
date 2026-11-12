@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type CSSProperties } from "react";
 import { GAMES, themes } from "@/lib/data";
-import { getProfil, loadProg, perfect, points, type Profil, type Prog } from "@/lib/util";
+import { getProfil, loadProg, finished, points, type Profil, type Prog } from "@/lib/util";
 import { Illus } from "./Illus";
 import Avatar from "./Avatar";
 
@@ -18,7 +18,7 @@ export default function ThemeMap() {
     setPf(x); setP(loadProg());
   }, [r]);
   if (!pf) return null;
-  const n = (slug: string) => GAMES.filter((g) => perfect(p[slug]?.[g.id])).length;
+  const n = (slug: string) => GAMES.filter((g) => finished(p[slug]?.[g.id])).length;
 
   return (
     <section className="mx-auto max-w-2xl px-4 py-8">
@@ -34,7 +34,7 @@ export default function ThemeMap() {
         </div>
       </div>
       <h1 className="mt-6 text-center text-4xl font-extrabold">Peta Petualangan</h1>
-      <p className="mt-1 text-center font-bold">Selesaikan semua game dengan sempurna untuk membuka tema berikutnya. Jika keluar sebelum satu tema selesai, tema itu diulang dari awal.</p>
+      <p className="mt-1 text-center font-bold">Selesaikan semua game untuk membuka tema berikutnya. Jika keluar sebelum satu tema selesai, tema itu diulang dari awal.</p>
       <label className="mx-auto mt-3 flex w-fit items-center gap-2 rounded-full bg-white px-4 py-1 text-sm font-bold">
         <input type="checkbox" checked={all} onChange={(e) => setAll(e.target.checked)} /> Buka semua tema (mode guru)
       </label>
@@ -50,7 +50,7 @@ export default function ThemeMap() {
               <span className="min-w-0 flex-1">
                 <span className="arab block text-left text-xl font-extrabold">{t.ar}</span>
                 <span className="block font-bold">{t.id}</span>
-                <span className="text-sm font-bold">{n(t.slug) === GAMES.length ? "🏆 Tema selesai!" : open ? `${n(t.slug)}/${GAMES.length} game sempurna` : "Selesaikan tema sebelumnya"}</span>
+                <span className="text-sm font-bold">{n(t.slug) === GAMES.length ? "🏆 Tema selesai!" : open ? `${n(t.slug)}/${GAMES.length} game selesai` : "Selesaikan tema sebelumnya"}</span>
               </span>
             </>
           );
