@@ -16,7 +16,7 @@ export function speak(text: string) {
 
 export const idOf = (nama: string, absen: string) => `${absen.trim()}-${nama.trim().toLowerCase()}`;
 export function getProfil(): Profil | null {
-  try { const p = JSON.parse(localStorage.getItem(PK) || "null"); return p && typeof p.avatar === "object" ? p : null; } catch { return null; }
+  try { const p = JSON.parse(localStorage.getItem(PK) || "null"); return p && typeof p.avatar?.sex === "number" && Array.isArray(p.avatar.acc) ? p : null; } catch { return null; }
 }
 export function setProfil(p: Profil) {
   try { localStorage.setItem(PK, JSON.stringify(p)); } catch {}

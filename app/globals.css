@@ -43,3 +43,11 @@ body {
   font-weight: 800; color: #2b2350; box-shadow: inset -8px -8px 0 rgb(0 0 0 / .1); animation: bob 3s ease-in-out infinite; }
 .balloon::after { content: ""; position: absolute; bottom: -1.3rem; left: 50%; width: 2px; height: 1.3rem; background: #2b2350; }
 @media (prefers-reduced-motion: reduce) { .float, .bob, .drift, .sun, .grad, .balloon, .wiggle { animation: none !important; } .confetti { display: none; } }
+
+@keyframes twinkle { 0%, 100% { opacity: .2; transform: scale(.6); } 50% { opacity: 1; transform: scale(1.25); } }
+.twinkle { transform-box: fill-box; transform-origin: center; animation: twinkle var(--d, 3s) ease-in-out infinite; }
+@keyframes sway { from { transform: rotate(-6deg); } to { transform: rotate(6deg); } }
+.sway { transform-box: fill-box; transform-origin: 50% 0; animation: sway 3s ease-in-out infinite alternate; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { transform-box: fill-box; transform-origin: center; animation: spin 60s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .twinkle, .sway, .spin { animation: none !important; } }

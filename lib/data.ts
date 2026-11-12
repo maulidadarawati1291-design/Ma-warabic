@@ -219,15 +219,25 @@ export function sentOf(w: Word, adj = false): Sent {
   return adj ? { ar: `${dem(w)} ${w.ar} ${w.g === "f" ? a[1] : a[0]}`, id: `Ini ${id} ${a[2]}.` } : { ar: `${dem(w)} ${w.ar}`, id: `Ini ${id}.` };
 }
 
-// Profil karakter: min = poin yang dibutuhkan untuk membuka bagian tersebut.
-export type Look = { skin: number; face: number; hair: number; hc: number; mood: number; outfit: number; acc: number };
-export const DEFAULT_LOOK: Look = { skin: 0, face: 0, hair: 0, hc: 0, mood: 0, outfit: 0, acc: 0 };
-export const SKINS = ["#ffdbb4", "#f1c27d", "#c68642", "#8d5524"];
-export const HAIRC = ["#2b2350", "#6b3e26", "#e9b44c", "#ff5fa2", "#3a86ff"];
-export const PARTS = {
-  face: [{ n: "Bulat", min: 0 }, { n: "Oval", min: 0 }, { n: "Kotak", min: 150 }],
-  hair: [{ n: "Pendek", min: 0 }, { n: "Jabrik", min: 0 }, { n: "Kuncir", min: 100 }, { n: "Panjang", min: 100 }, { n: "Hijab", min: 0 }],
-  mood: [{ n: "Senang", min: 0 }, { n: "Semangat", min: 0 }, { n: "Keren", min: 200 }, { n: "Jahil", min: 300 }],
-  outfit: [{ n: "Kaos", c: "#5aa0ff", min: 0 }, { n: "Hoodie", c: "#ff6b6b", min: 0 }, { n: "Jersey", c: "#2fbf71", min: 150 }, { n: "Pahlawan", c: "#a78bfa", min: 400 }, { n: "Astronot", c: "#f4f4f4", min: 700 }],
-  acc: [{ n: "Tanpa", min: 0 }, { n: "Kacamata", min: 0 }, { n: "Topi", min: 100 }, { n: "Headphone", min: 250 }, { n: "Bando", min: 50 }, { n: "Mahkota", min: 600 }],
-};
+// Profil karakter. min = poin yang dibutuhkan; f = khusus "b" (laki-laki) atau "g" (perempuan).
+export type Look = { sex: number; skin: number; face: number; hair: number; hijab: number; hc: number; mood: number; outfit: number; oc: number; acc: number[] };
+export const DEFAULT_LOOK: Look = { sex: 0, skin: 0, face: 0, hair: 0, hijab: 0, hc: 0, mood: 0, outfit: 0, oc: 0, acc: [] };
+export const SKINS = ["#ffe0c2", "#f6c99b", "#e0a070", "#b97a4a", "#8d5524"];
+export const HAIRC = ["#2b2350", "#6b3e26", "#e9b44c", "#ff5fa2", "#3a86ff", "#8e6bff", "#2fbf71", "#f4f4f4"];
+export const OUTC = ["#5aa0ff", "#ff6b6b", "#2fbf71", "#a78bfa", "#ffb830", "#ff5fa2", "#2ec4b6", "#2b2350", "#f4f4f4"];
+export type Opt = { n: string; min: number; f?: "b" | "g" };
+export const FACES: Opt[] = [{ n: "Bulat", min: 0 }, { n: "Oval", min: 0 }, { n: "Kotak", min: 150 }];
+export const HAIRS: Opt[] = [
+  { n: "Rapi", min: 0, f: "b" }, { n: "Jabrik", min: 0, f: "b" }, { n: "Belah Samping", min: 80, f: "b" }, { n: "Cepak", min: 0, f: "b" }, { n: "Keriting", min: 120, f: "b" },
+  { n: "Panjang", min: 0, f: "g" }, { n: "Kuncir Kuda", min: 0, f: "g" }, { n: "Kepang Dua", min: 80, f: "g" }, { n: "Bob", min: 0, f: "g" }, { n: "Cepol", min: 120, f: "g" }, { n: "Ikal", min: 200, f: "g" },
+];
+export const HIJABS: Opt[] = [{ n: "Tanpa Hijab", min: 0 }, { n: "Pashmina", min: 0 }, { n: "Segi Empat", min: 0 }, { n: "Instan", min: 0 }, { n: "Syar'i", min: 100 }];
+export const OUTFITS: Opt[] = [
+  { n: "Kaos", min: 0 }, { n: "Hoodie", min: 0 }, { n: "Jersey Bola", min: 100 }, { n: "Baju Koko", min: 0, f: "b" }, { n: "Gamis", min: 0, f: "g" },
+  { n: "Dress", min: 100, f: "g" }, { n: "Seragam", min: 0 }, { n: "Jaket Varsity", min: 200 }, { n: "Pahlawan", min: 400 }, { n: "Astronot", min: 700 },
+];
+export const ACCS: Opt[] = [
+  { n: "Kacamata", min: 0 }, { n: "Kacamata Hitam", min: 100 }, { n: "Topi", min: 50 }, { n: "Kupluk", min: 100 }, { n: "Peci", min: 0, f: "b" }, { n: "Headphone", min: 250 },
+  { n: "Bando", min: 0, f: "g" }, { n: "Pita", min: 50, f: "g" }, { n: "Jepit Bintang", min: 150, f: "g" }, { n: "Syal", min: 200 }, { n: "Mahkota", min: 600 },
+];
+export const MOODS: Opt[] = [{ n: "Senang", min: 0 }, { n: "Semangat", min: 0 }, { n: "Keren", min: 200 }, { n: "Jahil", min: 300 }];
