@@ -38,3 +38,9 @@ Progres tersimpan di `localStorage` per siswa (nama + nomor absen) pada perangka
 ## Penilaian
 Game berikutnya terbuka setelah game sebelumnya selesai (tidak harus sempurna). Setelah tiap game selesai, siswa melihat nilai dan koreksi jawaban yang salah. Soal diacak dengan tiga tingkat: Mudah, Sedang, Sulit.
 Suara mengikuti jenis karakter (perempuan atau laki-laki). Efek suara sorak dan "tet-tot" dibuat dengan WebAudio.
+
+## Catatan untuk guru
+- Tiap tema berisi 7 game berurutan: Kosakata dalam Kalimat, Kamus Bergambar, Kuis Pintar, Cocokkan Kartu, Susun Huruf (menulis kosakata), Pecah Balon, dan Misi Tema (khusus tiap tema, mengikuti aktivitas pada rancangan).
+- Game berikutnya terbuka setelah game sebelumnya selesai. Tiap game dimainkan sekali agar nilainya valid; setelah seluruh tema selesai, game bisa diulang.
+- Hasil tiap game menampilkan skor, jumlah salah, dan koreksi jawaban. Jumlah salah juga tersimpan (`salah`) pada data progres di `localStorage`.
+- Soal diacak dengan tingkat Mudah, Sedang, dan Sulit.

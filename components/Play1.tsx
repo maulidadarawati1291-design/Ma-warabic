@@ -1,28 +1,35 @@
 "use client";
 import { useEffect, useState, type CSSProperties } from "react";
 import { ADJ, TIPS, dem, sentOf, type Theme, type Word } from "@/lib/data";
-import { reaksi, shuffle, speak, type Res } from "@/lib/util";
+import { reaksi, shuffle, speak, tepukTangan, type Res } from "@/lib/util";
 import { Confetti, Illus } from "./Illus";
 
 export type Save = (g: string, r: Res) => void;
 export type Nav = { next: () => void; canAgain: boolean; last: boolean };
+export type Rv = { ar: string; id: string; note?: string };
 
-function Sound({ text, label = "Dengarkan" }: { text: string; label?: string }) {
+export function Sound({ text, label = "Dengarkan" }: { text: string; label?: string }) {
   return <button onClick={() => speak(text)} className="btn">🔊 {label}</button>;
 }
 
-// Teks Indonesia bercampur Arab: bagian Arab ditampilkan dengan font Arab.
-export function Rich({ s }: { s: string }) {
-  return <>{s.split(/([\u0600-\u06FF][\u0600-\u06FF\s،؟]*[\u0600-\u06FF؟]|[\u0600-\u06FF])/).map((x, i) => (i % 2 ? <span key={i} className="arab inline-block text-xl font-extrabold">{x}</span> : x))}</>;
+// Satu baris jawaban: Arab (besar, kanan) dan arti Indonesia (kiri), dipisah agar mudah dibaca.
+export function RvView({ r }: { r: Rv }) {
+  return (
+    <div className="rounded-xl bg-white p-3 text-center">
+      <p className="arab text-2xl font-extrabold">{r.ar}</p>
+      <p className="font-bold">{r.id}</p>
+      {r.note && <p className="mt-1 text-sm font-semibold">{r.note}</p>}
+    </div>
+  );
 }
 
-export function Koreksi({ items }: { items: string[] }) {
+export function Koreksi({ items }: { items: Rv[] }) {
   if (!items.length) return null;
   return (
-    <div className="mt-4 rounded-2xl bg-white/80 p-4 text-left">
+    <div className="mt-4 rounded-2xl bg-white/70 p-4">
       <p className="text-center text-lg font-extrabold">📝 Koreksi jawabanmu</p>
-      <p className="text-center text-sm font-bold">Pelajari lagi ya, semangat!</p>
-      <ul className="mt-2 grid gap-2">{items.map((x) => <li key={x} className="rounded-xl bg-white p-2 font-bold"><Rich s={x} /></li>)}</ul>
+      <p className="mb-2 text-center text-sm font-bold">Pelajari lagi ya, kamu pasti bisa!</p>
+      <div className="grid gap-2 sm:grid-cols-2">{items.map((x) => <RvView key={x.ar + x.id} r={x} />)}</div>
     </div>
   );
 }
@@ -35,10 +42,36 @@ export function Choice({ ok, again, nav }: { ok: boolean; again: () => void; nav
         <button className="btn" disabled={ok && !nav.canAgain} onClick={again}>🔁 Mulai permainan</button>
         <button className="btn" disabled={!ok} onClick={nav.next} style={{ "--c": "#ffd23f" } as CSSProperties}>{nav.last ? "🏆 Selesai" : "▶ Lanjut permainan"}</button>
       </div>
-      {ok && !nav.canAgain && <p className="mt-2 text-sm font-bold">Tiap game hanya dimainkan sekali agar nilainya valid. Bisa diulang setelah seluruh game di tema ini selesai.</p>}
+      {ok && !nav.canAgain && <p className="mt-2 text-sm font-bold">Game ini bisa dimainkan lagi setelah semua game di tema ini selesai.</p>}
     </div>
   );
 }
+
+// Layar hasil yang dipakai semua permainan.
+export function Done({ title, bg, score, total, wrong, salah, again, nav }: { title: string; bg: string; score: number; total: number; wrong: Rv[]; salah: number; again: () => void; nav: Nav }) {
+  return (
+    <div className={`panel ${bg} mt-6 p-6 text-center`}>
+      {score === total && <Confetti />}
+      <h2 className="text-2xl font-extrabold">{title}</h2>
+      <p className="text-xl font-bold">Skor {score} dari {total} (+{score * 10} poin)</p>
+      <p className="font-bold">Jumlah salah: {salah} kali</p>
+      <p className="my-2 text-lg font-extrabold">{score === total ? "Sempurna! Luar biasa! 🎉" : "Hebat, kamu sudah berusaha! Game berikutnya terbuka 🔓"}</p>
+      <Koreksi items={wrong} />
+      <Choice ok again={again} nav={nav} />
+    </div>
+  );
+}
+
+const Rows = ({ ex }: { ex: [string, string][] }) => (
+  <ul className="mt-2 grid gap-2">
+    {ex.map(([ar, id]) => (
+      <li key={ar} className="flex items-center justify-between gap-3 rounded-xl bg-white px-3 py-2">
+        <span className="text-sm font-bold">{id}</span>
+        <span className="arab text-2xl font-extrabold">{ar}</span>
+      </li>
+    ))}
+  </ul>
+);
 
 export function Kamus({ t, onSave, nav }: { t: Theme; onSave: Save; nav: Nav }) {
   const [q, setQ] = useState("");
@@ -89,20 +122,21 @@ export function Kamus({ t, onSave, nav }: { t: Theme; onSave: Save; nav: Nav }) 
       {tips.length > 0 && (
         <div className="card mt-8 bg-white p-5">
           <p className="text-center text-xl font-extrabold">💡 Info Bahasa Arab</p>
-          <ul className="mt-3 grid gap-3">
+          <ol className="mt-3 grid gap-4">
             {tips.map((x, i) => (
-              <li key={x.h} className="rounded-2xl p-3" style={{ background: t.bg }}>
-                <p className="font-extrabold">{i + 1}. {x.h}</p>
-                <p className="mt-1 font-semibold leading-relaxed"><Rich s={x.p} /></p>
+              <li key={x.h} className="rounded-2xl p-4" style={{ background: t.bg }}>
+                <p className="text-lg font-extrabold">{i + 1}. {x.h}</p>
+                <p className="mt-1 font-semibold leading-relaxed">{x.p}</p>
+                <Rows ex={x.ex} />
               </li>
             ))}
-          </ul>
+          </ol>
         </div>
       )}
       {t.words.some((w) => w.g) && (
-        <div className="card mt-6 bg-white p-4 text-center">
-          <p className="text-lg font-extrabold">📘 Ingat: kata tunjuk</p>
-          <p className="font-bold"><Rich s="هَذَا untuk benda mudzakkar (laki-laki), هَذِهِ untuk benda muannats (perempuan). Sifat juga mengikuti: كَبِيرٌ menjadi كَبِيرَةٌ." /></p>
+        <div className="card mt-6 bg-white p-4">
+          <p className="text-center text-lg font-extrabold">📘 Ingat: kata tunjuk</p>
+          <Rows ex={[["هَذَا", "untuk benda mudzakkar (laki-laki)"], ["هَذِهِ", "untuk benda muannats (perempuan)"]]} />
         </div>
       )}
       <div className="card mt-6 bg-white p-5 text-center">
@@ -126,10 +160,9 @@ export function Kamus({ t, onSave, nav }: { t: Theme; onSave: Save; nav: Nav }) 
 }
 
 type T = "gambar" | "bs" | "arti" | "arab" | "gen" | "dengar" | "sfat" | "susun";
-type Q = { t: T; lv: 1 | 2 | 3; w: Word; x?: Word; opts: string[]; ans: string; rev: string; toks?: string[]; hint?: string };
-// Tingkat kesulitan: 1 mudah, 2 sedang, 3 sulit. Soal diacak urutannya.
+type Q = { t: T; lv: 1 | 2 | 3; w: Word; x?: Word; opts: string[]; ans: string; rv: Rv; toks?: string[]; hint?: string };
+// Soal diacak dari mudah sampai sulit (warna kotak mengikuti tingkat).
 const LV: Record<T, 1 | 2 | 3> = { gambar: 1, bs: 1, arti: 2, arab: 2, gen: 2, dengar: 3, sfat: 3, susun: 3 };
-const LB = ["Mudah", "Sedang", "Sulit"];
 
 function build(t: Theme): Q[] {
   const ws = shuffle(t.words);
@@ -142,23 +175,23 @@ function build(t: Theme): Q[] {
     const ty: T = (ty0 === "gen" || ty0 === "sfat") && !w.g ? (ty0 === "gen" ? "arti" : "dengar") : ty0;
     const lv = LV[ty];
     const others = shuffle(t.words.filter((x) => x.ar !== w.ar));
-    const rev = `${w.ar} = ${w.id}`;
+    const rv: Rv = { ar: w.ar, id: w.id };
     if (ty === "bs") {
       const x = Math.random() < 0.5 ? w : others[0];
-      return { t: ty, lv, w, x, opts: ["ya", "tidak"], ans: x.ar === w.ar ? "ya" : "tidak", rev };
+      return { t: ty, lv, w, x, opts: ["ya", "tidak"], ans: x.ar === w.ar ? "ya" : "tidak", rv };
     }
     if (ty === "gen") {
-      return { t: ty, lv, w, opts: ["هَذَا", "هَذِهِ"], ans: dem(w), rev: `${dem(w)} ${w.ar} = Ini ${w.id.toLowerCase()}. ${w.ar} termasuk ${w.g === "f" ? "muannats, maka memakai هَذِهِ" : "mudzakkar, maka memakai هَذَا"}.` };
+      return { t: ty, lv, w, opts: ["هَذَا", "هَذِهِ"], ans: dem(w), rv: { ar: `${dem(w)} ${w.ar}`, id: `Ini ${w.id.toLowerCase()}.`, note: w.g === "f" ? "Kata ini muannats (perempuan), jadi memakai kata tunjuk muannats." : "Kata ini mudzakkar (laki-laki), jadi memakai kata tunjuk mudzakkar." } };
     }
     if (ty === "sfat") {
       const a = ADJ[Math.floor(Math.random() * ADJ.length)];
       const ans = w.g === "f" ? a[1] : a[0];
-      return { t: ty, lv, w, opts: shuffle([a[0], a[1]]), ans, rev: `${dem(w)} ${w.ar} ${ans} = Ini ${w.id.toLowerCase()} ${a[2]}. Sifat mengikuti jenis kata bendanya.` };
+      return { t: ty, lv, w, opts: shuffle([a[0], a[1]]), ans, rv: { ar: `${dem(w)} ${w.ar} ${ans}`, id: `Ini ${w.id.toLowerCase()} ${a[2]}.`, note: "Sifat harus sama jenisnya dengan kata benda. Muannats memakai akhiran ة." } };
     }
-    return { t: ty, lv, w, opts: shuffle([w, ...others.slice(0, 3)]).map((o) => o.ar), ans: w.ar, rev };
+    return { t: ty, lv, w, opts: shuffle([w, ...others.slice(0, 3)]).map((o) => o.ar), ans: w.ar, rv };
   });
   const s = gw.length ? sentOf(gw[Math.floor(Math.random() * gw.length)], true) : shuffle(t.ex)[0];
-  qs.push({ t: "susun", lv: 3, w: ws[0], opts: [], ans: s.ar, rev: `${s.ar} = ${s.id}`, toks: shuffle(s.ar.split(" ")), hint: s.id });
+  qs.push({ t: "susun", lv: 3, w: ws[0], opts: [], ans: s.ar, rv: { ar: s.ar, id: s.id }, toks: shuffle(s.ar.split(" ")), hint: s.id });
   return shuffle(qs);
 }
 
@@ -168,7 +201,7 @@ export function Quiz({ t, onSave, nav }: { t: Theme; onSave: Save; nav: Nav }) {
   const [pick, setPick] = useState<string | null>(null);
   const [built, setBuilt] = useState<number[]>([]);
   const [score, setScore] = useState(0);
-  const [wrong, setWrong] = useState<string[]>([]);
+  const [wrong, setWrong] = useState<Rv[]>([]);
   const [done, setDone] = useState(false);
   const q = qs[i];
   const byAr = (a: string) => t.words.find((x) => x.ar === a)!;
@@ -180,46 +213,35 @@ export function Quiz({ t, onSave, nav }: { t: Theme; onSave: Save; nav: Nav }) {
     if (pick !== null) return;
     setPick(k);
     reaksi(k === q.ans);
-    if (k === q.ans) setScore(score + 1); else setWrong([...wrong, q.rev]);
+    if (k === q.ans) setScore(score + 1); else setWrong([...wrong, q.rv]);
   }
   function next() {
     if (i + 1 < qs.length) { setI(i + 1); setPick(null); setBuilt([]); return; }
-    onSave("kuis", { score, total: qs.length });
+    onSave("kuis", { score, total: qs.length, salah: qs.length - score });
+    if (score === qs.length) tepukTangan();
     setDone(true);
   }
 
   if (!qs.length) {
     return (
       <div className="panel lv2 mt-6 p-6 text-center">
-        <p className="text-xl font-extrabold">Kuis 10 soal dengan tingkat Mudah, Sedang, dan Sulit, diacak!</p>
-        <p className="mb-4 font-semibold">Tiap soal hanya dikerjakan sekali agar nilainya valid. Setelah selesai, kamu akan melihat koreksinya.</p>
-        <button onClick={start} className="btn text-xl">▶ Mulai Kuis</button>
+        <p className="text-2xl font-extrabold">Siap jadi jagoan bahasa Arab? 💪</p>
+        <p className="mb-4 font-semibold">Dengarkan, baca, lalu pilih jawaban yang paling tepat. Kamu pasti bisa, semangat!</p>
+        <button onClick={start} className="btn text-xl">▶ Mulai</button>
       </div>
     );
   }
-
-  if (done) {
-    return (
-      <div className="panel lv3 mt-6 p-6 text-center">
-        {score === qs.length && <Confetti />}
-        <h2 className="text-2xl font-extrabold">Misimu selesai!</h2>
-        <p className="my-2 text-xl font-extrabold">{score === qs.length ? "Sempurna! 🎉" : "Game berikutnya terbuka 🔓"}</p>
-        <p className="text-xl font-bold">Skor {score} dari {qs.length} (+{score * 10} poin)</p>
-        <Koreksi items={wrong} />
-        <Choice ok again={start} nav={nav} />
-      </div>
-    );
-  }
+  if (done) return <Done title="Misimu selesai!" bg="lv3" score={score} total={qs.length} salah={qs.length - score} wrong={wrong} again={start} nav={nav} />;
 
   const oc = (k: string) => pick === null ? "bg-white" : k === q.ans ? "bg-green-300" : k === pick ? "bg-red-200" : "bg-white opacity-50";
   const opt = "rounded-2xl p-3 text-xl font-extrabold shadow-[0_4px_0_rgba(0,0,0,.15)] ";
   return (
     <div className={`panel lv${q.lv} mt-6 p-5 text-center`}>
       <div className="mb-3 h-3 rounded-full bg-white"><div className="h-3 rounded-full" style={{ width: `${(i / qs.length) * 100}%`, background: t.c }} /></div>
-      <p className="font-bold">Soal {i + 1} dari {qs.length} <span className="ml-2 rounded-full bg-white px-3 py-0.5 text-sm">{"⭐".repeat(q.lv)} {LB[q.lv - 1]}</span></p>
+      <p className="font-bold">Soal {i + 1} dari {qs.length}</p>
       {q.t === "arti" && <div className="my-3"><p className="font-bold">Apa arti kata ini?</p><p className="arab text-5xl font-extrabold">{q.w.ar}</p></div>}
       {q.t === "gambar" && <div className="my-3"><p className="mb-2 font-bold">Dengarkan, lalu pilih gambarnya:</p><Sound text={q.w.ar} label="Putar lagi" /></div>}
-      {q.t === "dengar" && <div className="my-3"><p className="mb-2 font-bold">Dengarkan, lalu pilih artinya (tanpa gambar):</p><Sound text={q.w.ar} label="Putar lagi" /></div>}
+      {q.t === "dengar" && <div className="my-3"><p className="mb-2 font-bold">Dengarkan baik-baik, lalu pilih artinya:</p><Sound text={q.w.ar} label="Putar lagi" /></div>}
       {q.t === "arab" && <div className="my-3"><p className="font-bold">Pilih kata Arab untuk gambar ini:</p><Illus e={q.w.e} size={96} /><p className="text-2xl font-extrabold">{q.w.id}</p></div>}
       {q.t === "bs" && <div className="my-3"><p className="font-bold">Cocokkah gambar dan katanya?</p><Illus e={q.w.e} size={96} /><p className="arab text-4xl font-extrabold">{q.x!.ar}</p></div>}
       {q.t === "gen" && <div className="my-3"><p className="font-bold">Pilih kata tunjuk yang tepat:</p><Illus e={q.w.e} size={96} /><p className="arab text-4xl font-extrabold">_____ {q.w.ar}</p></div>}
@@ -246,7 +268,8 @@ export function Quiz({ t, onSave, nav }: { t: Theme; onSave: Save; nav: Nav }) {
       )}
       {pick !== null && (
         <div className="pop mt-4">
-          <p className="text-xl font-extrabold">{pick === q.ans ? "Benar, hebat! 🎉" : <>😢 Hampir! Jawabannya: <Rich s={q.rev} /></>}</p>
+          <p className="mb-2 text-xl font-extrabold">{pick === q.ans ? "Benar, hebat! 🎉" : "😢 Hampir! Jawaban yang benar:"}</p>
+          {pick !== q.ans && <RvView r={q.rv} />}
           <button onClick={next} className="btn mt-3">{i + 1 < qs.length ? "Lanjut ▶" : "Lihat hasil"}</button>
         </div>
       )}

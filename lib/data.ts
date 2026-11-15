@@ -204,17 +204,20 @@ export const themes: Theme[] = [
 ];
 
 export const GAMES = [
+  { id: "kalimat", n: "Kosakata dalam Kalimat", e: "💬" },
   { id: "kamus", n: "Kamus Bergambar", e: "📖" },
   { id: "kuis", n: "Kuis Pintar", e: "🎮" },
   { id: "cocok", n: "Cocokkan Kartu", e: "🃏" },
+  { id: "huruf", n: "Susun Huruf", e: "✍️" },
   { id: "balon", n: "Pecah Balon", e: "🎈" },
+  { id: "misi", n: "Misi Tema", e: "🚀" },
 ];
 
 // Kata tunjuk dan sifat harus sesuai jenis kata benda: هَذَا + mudzakkar, هَذِهِ + muannats; sifat muannats berakhiran ة.
 export const dem = (w: Word) => (w.g === "f" ? "هَذِهِ" : "هَذَا");
 export const ADJ = [["كَبِيرٌ", "كَبِيرَةٌ", "besar"], ["جَمِيلٌ", "جَمِيلَةٌ", "indah"], ["جَدِيدٌ", "جَدِيدَةٌ", "baru"], ["صَغِيرٌ", "صَغِيرَةٌ", "kecil"]];
-export function sentOf(w: Word, adj = false): Sent {
-  const a = ADJ[Math.floor(Math.random() * ADJ.length)];
+export function sentOf(w: Word, adj = false, k?: number): Sent {
+  const a = ADJ[k !== undefined ? k % ADJ.length : Math.floor(Math.random() * ADJ.length)];
   const id = w.id.toLowerCase();
   return adj ? { ar: `${dem(w)} ${w.ar} ${w.g === "f" ? a[1] : a[0]}`, id: `Ini ${id} ${a[2]}.` } : { ar: `${dem(w)} ${w.ar}`, id: `Ini ${id}.` };
 }
@@ -242,51 +245,103 @@ export const ACCS: Opt[] = [
 ];
 export const MOODS: Opt[] = [{ n: "Senang", min: 0 }, { n: "Semangat", min: 0 }, { n: "Keren", min: 200 }, { n: "Jahil", min: 300 }];
 
-// Info kaidah bahasa Arab yang berkaitan dengan tiap tema (ditampilkan di Kamus Bergambar).
-export const TIPS: Record<string, { h: string; p: string }[]> = {
+// Info kaidah bahasa Arab per tema: penjelasan Indonesia (p) dan contoh Arab-Indonesia (ex) dipisah agar rapi dibaca.
+type Tip = { h: string; p: string; ex: [string, string][] };
+export const TIPS: Record<string, Tip[]> = {
   "anggota-tubuh": [
-    { h: "Muannats bukan hanya yang berakhiran ة", p: "Kata benda muannats ada 3 macam. (1) Berakhiran ة (ta marbuthah): رُكْبَةٌ، عَضَلَةٌ. (2) Bermakna perempuan walau tanpa ة: أُمٌّ (ibu), بِنْتٌ (anak perempuan). (3) Muannats menurut kebiasaan orang Arab, terutama anggota tubuh yang berpasangan: عَيْنٌ، أُذُنٌ، يَدٌ، رِجْلٌ، قَدَمٌ، سِنٌّ. Jadi yang benar هَذِهِ يَدٌ." },
-    { h: "Anggota tubuh yang mudzakkar", p: "Tidak semua anggota tubuh muannats. Yang mudzakkar: رَأْسٌ، أَنْفٌ، فَمٌ، وَجْهٌ، قَلْبٌ، شَعْرٌ، لِسَانٌ. Jadi yang benar هَذَا أَنْفٌ." },
-    { h: "Bentuk berpasangan (mutsanna)", p: "Untuk dua benda tambahkan ـَانِ: يَدٌ menjadi يَدَانِ، عَيْنٌ menjadi عَيْنَانِ، أُذُنٌ menjadi أُذُنَانِ. Pada posisi nashab dan jar, ـَانِ berubah menjadi ـَيْنِ: يَدَيْنِ، عَيْنَيْنِ." },
+    { h: "Muannats tidak hanya yang berakhiran ة", p: "Ada tiga jenis kata muannats: berakhiran ta marbuthah (ة), bermakna perempuan walau tanpa ة, dan muannats menurut kebiasaan orang Arab, misalnya anggota tubuh yang berpasangan.", ex: [["رُكْبَةٌ", "lutut (berakhiran ة)"], ["أُمٌّ", "ibu (bermakna perempuan)"], ["عَيْنٌ", "mata (kebiasaan)"], ["يَدٌ", "tangan (kebiasaan)"], ["رِجْلٌ", "kaki (kebiasaan)"], ["أُذُنٌ", "telinga (kebiasaan)"]] },
+    { h: "Kata tunjuk mengikuti jenis kata", p: "Benda muannats memakai kata tunjuk muannats, benda mudzakkar memakai kata tunjuk mudzakkar.", ex: [["هَذِهِ يَدٌ", "Ini tangan (muannats)"], ["هَذَا أَنْفٌ", "Ini hidung (mudzakkar)"], ["هَذَا رَأْسٌ", "Ini kepala (mudzakkar)"]] },
+    { h: "Anggota tubuh berpasangan (mutsanna)", p: "Untuk dua benda, tambahkan akhiran ـَانِ. Pada posisi nashab dan jar, akhiran berubah menjadi ـَيْنِ.", ex: [["يَدَانِ", "dua tangan"], ["عَيْنَانِ", "dua mata"], ["اِفْتَحْ عَيْنَيْكَ", "bukalah kedua matamu"]] },
   ],
   "kebun-binatang": [
-    { h: "Sifat mengikuti kata benda", p: "Kata sifat harus sama jenisnya dengan kata benda: أَسَدٌ كَبِيرٌ (singa besar), زَرَافَةٌ كَبِيرَةٌ (jerapah besar)." },
-    { h: "Jamak hewan dianggap muannats tunggal", p: "Jamak dari hewan dan benda diperlakukan seperti muannats tunggal, jadi memakai هَذِهِ dan sifat berakhiran ة: هَذِهِ حَيَوَانَاتٌ كَبِيرَةٌ (ini hewan-hewan besar)." },
-    { h: "Huruf jar فِي", p: "Setelah فِي, kata benda berharakat kasrah: فِي حَدِيقَةِ الْحَيَوَانَاتِ (di kebun binatang). حَدِيقَةُ الْحَيَوَانَاتِ adalah susunan idhafah: kebun milik hewan-hewan." },
+    { h: "Sifat mengikuti kata benda", p: "Kata sifat harus sama jenisnya dengan kata benda. Untuk muannats, sifat diberi akhiran ة.", ex: [["أَسَدٌ كَبِيرٌ", "singa yang besar"], ["زَرَافَةٌ كَبِيرَةٌ", "jerapah yang besar"]] },
+    { h: "Jamak hewan dianggap muannats tunggal", p: "Jamak dari hewan atau benda memakai kata tunjuk dan sifat muannats tunggal.", ex: [["هَذِهِ حَيَوَانَاتٌ كَبِيرَةٌ", "Ini hewan-hewan besar"]] },
+    { h: "Huruf jar dan idhafah", p: "Kata benda sesudah huruf jar berharakat kasrah. Dua kata benda yang disusun berurutan menyatakan kepemilikan dan disebut idhafah.", ex: [["فِي حَدِيقَةِ الْحَيَوَانَاتِ", "di kebun binatang"]] },
   ],
   "ruang-tamu-belajar": [
-    { h: "Nama alat berawalan مِـ", p: "Banyak nama alat berawalan مِـ: مِفْتَاحٌ (kunci), مِصْبَاحٌ (lampu), مِسْطَرَةٌ (penggaris), مِكْنَسَةٌ (sapu), مِقَصٌّ (gunting)." },
-    { h: "Menyebut letak benda", p: "Kata sesudah huruf jar berharakat kasrah: عَلَى (di atas), فِي (di dalam), تَحْتَ (di bawah). Contoh: الْكِتَابُ عَلَى الطَّاوِلَةِ، الْقَلَمُ فِي الْحَقِيبَةِ." },
-    { h: "Fungsi alif lam (الـ)", p: "Tanpa الـ, kata bersifat umum dan bertanwin: كِتَابٌ (sebuah buku). Dengan الـ menjadi tertentu dan tanwin hilang: الْكِتَابُ (buku itu)." },
+    { h: "Nama alat berawalan م", p: "Banyak nama alat diawali huruf mim berkasrah.", ex: [["مِفْتَاحٌ", "kunci"], ["مِصْبَاحٌ", "lampu"], ["مِسْطَرَةٌ", "penggaris"], ["مِكْنَسَةٌ", "sapu"], ["مِقَصٌّ", "gunting"]] },
+    { h: "Menyebut letak benda", p: "Setelah kata letak, kata benda berharakat kasrah.", ex: [["الْكِتَابُ عَلَى الطَّاوِلَةِ", "Buku di atas meja"], ["الْقَلَمُ فِي الْحَقِيبَةِ", "Pena di dalam tas"], ["الْكُرَةُ تَحْتَ الْكُرْسِيِّ", "Bola di bawah kursi"]] },
+    { h: "Fungsi alif lam (الـ)", p: "Tanpa alif lam, kata bersifat umum dan bertanwin. Dengan alif lam, kata menjadi tertentu dan tanwin hilang.", ex: [["كِتَابٌ", "sebuah buku"], ["الْكِتَابُ", "buku itu"]] },
   ],
   "perpustakaan": [
-    { h: "Nama tempat berawalan مَـ", p: "Banyak kata tempat berawalan مَـ: مَكْتَبَةٌ (perpustakaan), مَدْرَسَةٌ (sekolah), مَطْعَمٌ (restoran), مَلْعَبٌ (lapangan)." },
-    { h: "Pasangan laki-laki dan perempuan", p: "Untuk pelaku perempuan tambahkan ة: مُعَلِّمٌ menjadi مُعَلِّمَةٌ (guru), طَالِبٌ menjadi طَالِبَةٌ (siswa). Contoh: هَذَا مُعَلِّمٌ، هَذِهِ مُعَلِّمَةٌ." },
-    { h: "Kata tanya", p: "مَا untuk benda, مَنْ untuk orang, أَيْنَ untuk tempat. Contoh: مَا هَذَا؟ هَذَا كِتَابٌ. مَنْ هَذِهِ؟ هَذِهِ مُعَلِّمَةٌ. أَيْنَ الْكِتَابُ؟" },
+    { h: "Nama tempat berawalan م", p: "Banyak kata tempat diawali huruf mim berfathah.", ex: [["مَكْتَبَةٌ", "perpustakaan"], ["مَدْرَسَةٌ", "sekolah"], ["مَطْعَمٌ", "restoran"], ["مَلْعَبٌ", "lapangan"]] },
+    { h: "Pasangan laki-laki dan perempuan", p: "Untuk pelaku perempuan, tambahkan ة di akhir kata.", ex: [["مُعَلِّمٌ", "guru laki-laki"], ["مُعَلِّمَةٌ", "guru perempuan"], ["طَالِبٌ", "siswa laki-laki"], ["طَالِبَةٌ", "siswa perempuan"]] },
+    { h: "Kata tanya", p: "Pilih kata tanya sesuai yang ditanyakan: benda, orang, atau tempat.", ex: [["مَا هَذَا؟", "Apa ini?"], ["مَنْ هَذِهِ؟", "Siapa ini?"], ["أَيْنَ الْكِتَابُ؟", "Di mana buku itu?"]] },
   ],
   "kantin": [
-    { h: "Meminta sesuatu", p: "Setelah أُرِيدُ (saya ingin), benda yang diinginkan berakhiran fathah atau tanwin fathah: أُرِيدُ مَاءً، أُرِيدُ خُبْزًا، أُرِيدُ عَصِيرًا." },
-    { h: "Bentuk kolektif dan satuan", p: "Nama buah dan sayur biasanya bentuk kolektif (mudzakkar). Untuk satuannya tambahkan ة (muannats): تُفَّاحٌ menjadi تُفَّاحَةٌ (sebuah apel), مَوْزٌ menjadi مَوْزَةٌ (sebuah pisang), بَيْضٌ menjadi بَيْضَةٌ (sebutir telur)." },
-    { h: "Makan dan minum", p: "آكُلُ berarti saya makan, أَشْرَبُ berarti saya minum. Awalan أ pada kata kerja berarti saya: آكُلُ خُبْزًا، أَشْرَبُ مَاءً." },
+    { h: "Meminta sesuatu", p: "Benda yang diminta berakhiran fathah atau tanwin fathah.", ex: [["أُرِيدُ مَاءً", "Saya ingin air"], ["أُرِيدُ خُبْزًا", "Saya ingin roti"], ["أُرِيدُ عَصِيرًا", "Saya ingin jus"]] },
+    { h: "Bentuk kolektif dan satuan", p: "Nama buah biasanya bentuk kolektif (mudzakkar). Untuk satu buah, tambahkan ة (muannats).", ex: [["تُفَّاحٌ", "apel (umum)"], ["تُفَّاحَةٌ", "sebuah apel"], ["مَوْزَةٌ", "sebuah pisang"], ["بَيْضَةٌ", "sebutir telur"]] },
+    { h: "Makan dan minum", p: "Awalan hamzah pada kata kerja masa kini berarti saya.", ex: [["آكُلُ خُبْزًا", "Saya makan roti"], ["أَشْرَبُ مَاءً", "Saya minum air"]] },
   ],
   "jam-waktu": [
-    { h: "Menyebut jam", p: "سَاعَةٌ muannats, jadi angka urutnya juga muannats: السَّاعَةُ الْوَاحِدَةُ (jam 1), الثَّانِيَةُ (jam 2), الثَّالِثَةُ (jam 3), sampai السَّابِعَةُ (jam 7). Tanya: كَمِ السَّاعَةُ؟ Jawab: السَّاعَةُ السَّابِعَةُ." },
-    { h: "Setengah dan seperempat", p: "السَّابِعَةُ وَالنِّصْفُ berarti 07.30. السَّابِعَةُ وَالرُّبْعُ berarti 07.15. السَّابِعَةُ إِلَّا رُبْعًا berarti 06.45." },
-    { h: "Keterangan waktu dan jenis kata", p: "Kata waktu seperti صَبَاحًا، ظُهْرًا، مَسَاءً، غَدًا berakhiran tanwin fathah. Hari, pekan, dan bulan mudzakkar: يَوْمٌ، أُسْبُوعٌ، شَهْرٌ. Tahun dan menit muannats: سَنَةٌ، دَقِيقَةٌ." },
+    { h: "Menyebut jam", p: "Kata jam termasuk muannats, jadi angka urutnya juga muannats.", ex: [["كَمِ السَّاعَةُ؟", "Jam berapa?"], ["السَّاعَةُ الْوَاحِدَةُ", "Jam satu"], ["السَّاعَةُ السَّابِعَةُ", "Jam tujuh"]] },
+    { h: "Setengah dan seperempat", p: "Sebutkan jamnya, lalu tambahkan setengah atau seperempat. Untuk waktu kurang, ada kata khusus yang berarti kecuali.", ex: [["السَّابِعَةُ وَالنِّصْفُ", "07.30"], ["السَّابِعَةُ وَالرُّبْعُ", "07.15"], ["السَّابِعَةُ إِلَّا رُبْعًا", "06.45"]] },
+    { h: "Keterangan waktu", p: "Kata waktu berakhiran tanwin fathah. Hari, pekan, dan bulan mudzakkar; tahun dan menit muannats.", ex: [["صَبَاحًا", "pagi hari"], ["مَسَاءً", "sore atau malam"], ["يَوْمٌ", "hari (mudzakkar)"], ["سَنَةٌ", "tahun (muannats)"]] },
   ],
   "saya-suka-bahasa-arab": [
-    { h: "Awalan kata kerja", p: "Kata kerja masa kini berawalan أَ/أُ/آ berarti saya: أَقْرَأُ، أَكْتُبُ، آكُلُ. Awalan نَـ berarti kami: نَقْرَأُ. Bentuk untuk saya sama untuk laki-laki dan perempuan." },
-    { h: "Menyebut yang disuka", p: "Benda yang disukai berakhiran fathah: أُحِبُّ الْقِرَاءَةَ (saya suka membaca), أَنَا أُحِبُّ اللُّغَةَ الْعَرَبِيَّةَ. Kata أَنَا (saya) boleh dihilangkan." },
-    { h: "Sifat mengikuti jenis kata", p: "اللُّغَةُ muannats, jadi sifatnya muannats: اللُّغَةُ الْعَرَبِيَّةُ. Bandingkan dengan mudzakkar: الْكِتَابُ الْعَرَبِيُّ." },
+    { h: "Awalan kata kerja", p: "Kata kerja masa kini berawalan hamzah berarti saya, berawalan nun berarti kami. Bentuk untuk saya sama bagi laki-laki dan perempuan.", ex: [["أَقْرَأُ", "saya membaca"], ["أَكْتُبُ", "saya menulis"], ["نَقْرَأُ", "kami membaca"]] },
+    { h: "Menyebut yang disuka", p: "Benda yang disukai berakhiran fathah. Kata ganti saya di awal kalimat boleh dihilangkan.", ex: [["أُحِبُّ الْقِرَاءَةَ", "Saya suka membaca"], ["أَنَا أُحِبُّ اللُّغَةَ الْعَرَبِيَّةَ", "Saya suka bahasa Arab"]] },
+    { h: "Sifat mengikuti jenis kata", p: "Kata bahasa termasuk muannats, jadi sifatnya muannats. Kata buku mudzakkar, jadi sifatnya mudzakkar.", ex: [["اللُّغَةُ الْعَرَبِيَّةُ", "bahasa Arab"], ["الْكِتَابُ الْعَرَبِيُّ", "buku Arab"]] },
   ],
   "kegiatan-liburan": [
-    { h: "Huruf jar", p: "إِلَى berarti ke, مَعَ berarti bersama, بِـ berarti dengan atau naik. Contoh: أَذْهَبُ إِلَى الْحَدِيقَةِ، أَلْعَبُ مَعَ أَصْدِقَائِي، أُسَافِرُ بِالْقِطَارِ." },
-    { h: "Menyatakan kepemilikan", p: "Tambahkan akhiran: ـِي (milikku), ـكَ (milikmu, laki-laki), ـكِ (milikmu, perempuan), ـهُ (miliknya, laki-laki), ـهَا (miliknya, perempuan). Contoh: كِتَابِي، كِتَابُكَ، كِتَابُكِ، كِتَابُهُ، كِتَابُهَا." },
-    { h: "Alat transportasi", p: "قِطَارٌ mudzakkar, sedangkan سَيَّارَةٌ، طَائِرَةٌ، سَفِينَةٌ، دَرَّاجَةٌ muannats: هَذَا قِطَارٌ، هَذِهِ سَيَّارَةٌ." },
+    { h: "Huruf jar", p: "Huruf jar menunjukkan arah, kebersamaan, atau alat. Kata benda sesudahnya berharakat kasrah.", ex: [["أَذْهَبُ إِلَى الْحَدِيقَةِ", "Saya pergi ke taman"], ["أَلْعَبُ مَعَ أَصْدِقَائِي", "Saya bermain bersama teman-temanku"], ["أُسَافِرُ بِالْقِطَارِ", "Saya bepergian naik kereta"]] },
+    { h: "Menyatakan kepemilikan", p: "Tambahkan akhiran di belakang kata benda untuk menyatakan milik siapa.", ex: [["كِتَابِي", "bukuku"], ["كِتَابُكَ", "bukumu (laki-laki)"], ["كِتَابُكِ", "bukumu (perempuan)"], ["كِتَابُهُ", "bukunya (laki-laki)"], ["كِتَابُهَا", "bukunya (perempuan)"]] },
+    { h: "Alat transportasi", p: "Kereta mudzakkar, sedangkan mobil, pesawat, kapal, dan sepeda muannats.", ex: [["هَذَا قِطَارٌ", "Ini kereta"], ["هَذِهِ سَيَّارَةٌ", "Ini mobil"]] },
   ],
   "piknik": [
-    { h: "Benda alam yang muannats", p: "Beberapa benda alam muannats menurut kebiasaan walau tanpa ة: شَمْسٌ (matahari), سَمَاءٌ (langit). Sedangkan قَمَرٌ، نَهْرٌ، مَطَرٌ mudzakkar. Contoh: الشَّمْسُ جَمِيلَةٌ." },
-    { h: "Jamak manusia dan bukan manusia", p: "Untuk banyak orang pakai هَؤُلَاءِ: هَؤُلَاءِ أَصْدِقَاءُ. Untuk jamak benda atau hewan pakai هَذِهِ: هَذِهِ أَزْهَارٌ." },
-    { h: "Mengajak", p: "لِنَذْهَبْ berarti mari kita pergi (kata kerja bersukun setelah لِـ): لِنَذْهَبْ إِلَى الْحَدِيقَةِ. Bisa juga هَيَّا بِنَا نَذْهَبْ." },
+    { h: "Benda alam yang muannats", p: "Beberapa benda alam muannats menurut kebiasaan walau tanpa ة. Lainnya mudzakkar.", ex: [["الشَّمْسُ جَمِيلَةٌ", "Matahari itu indah (muannats)"], ["النَّهْرُ جَمِيلٌ", "Sungai itu indah (mudzakkar)"]] },
+    { h: "Jamak manusia dan bukan manusia", p: "Untuk banyak orang, pakai kata tunjuk jamak khusus. Untuk jamak benda atau hewan, pakai kata tunjuk muannats tunggal.", ex: [["هَؤُلَاءِ أَصْدِقَاءُ", "Mereka adalah teman-teman"], ["هَذِهِ أَزْهَارٌ", "Ini bunga-bunga"]] },
+    { h: "Mengajak", p: "Awalan lam sebelum kata kerja bermakna ajakan, dan kata kerjanya bersukun.", ex: [["لِنَذْهَبْ إِلَى الْحَدِيقَةِ", "Mari kita pergi ke taman"], ["هَيَّا بِنَا نَذْهَبْ", "Ayo kita pergi"]] },
   ],
 };
+
+// Misi Tema: permainan khusus tiap tema, mengikuti aktivitas pada rancangan awal.
+export type MItem = { ar: string; id: string; w?: string; f?: string; e?: string; ans?: string; opts?: string[]; s?: number; o?: number };
+export type MisiDef = { n: string; e: string; kind: "perintah" | "jam" | "lengkapi" | "urut"; items: MItem[] };
+const P = (ar: string, id: string, w: string, f?: string): MItem => ({ ar, id, w, f });
+const L = (ar: string, ans: string, opts: string[], id: string): MItem => ({ ar, ans, opts, id });
+const U = (s: number, o: number, ar: string, id: string, e: string): MItem => ({ s, o, ar, id, e });
+export const ORD = ["الْوَاحِدَةُ", "الثَّانِيَةُ", "الثَّالِثَةُ", "الرَّابِعَةُ", "الْخَامِسَةُ", "السَّادِسَةُ", "السَّابِعَةُ", "الثَّامِنَةُ", "التَّاسِعَةُ", "الْعَاشِرَةُ", "الْحَادِيَةَ عَشْرَةَ", "الثَّانِيَةَ عَشْرَةَ"];
+export const MISI: Record<string, MisiDef> = {
+  "anggota-tubuh": { n: "Perintah Guru", e: "🧑‍🏫", kind: "perintah", items: [
+    P("اِفْتَحْ عَيْنَيْكَ", "Bukalah matamu", "عَيْنٌ", "اِفْتَحِي عَيْنَيْكِ"), P("أَشِرْ إِلَى أَنْفِكَ", "Tunjuklah hidungmu", "أَنْفٌ", "أَشِيرِي إِلَى أَنْفِكِ"),
+    P("اِرْفَعْ يَدَكَ", "Angkatlah tanganmu", "يَدٌ", "اِرْفَعِي يَدَكِ"), P("اِفْتَحْ فَمَكَ", "Bukalah mulutmu", "فَمٌ", "اِفْتَحِي فَمَكِ"),
+    P("حَرِّكْ رِجْلَكَ", "Gerakkan kakimu", "رِجْلٌ", "حَرِّكِي رِجْلَكِ"), P("اِلْمِسْ رَأْسَكَ", "Sentuhlah kepalamu", "رَأْسٌ", "اِلْمِسِي رَأْسَكِ")] },
+  "kebun-binatang": { n: "Tebak Hewan", e: "🔍", kind: "perintah", items: [
+    P("أَيْنَ الْأَسَدُ؟", "Di mana singa?", "أَسَدٌ"), P("أَيْنَ الْفِيلُ؟", "Di mana gajah?", "فِيلٌ"), P("أَيْنَ الْقِرْدُ؟", "Di mana monyet?", "قِرْدٌ"),
+    P("أَيْنَ الزَّرَافَةُ؟", "Di mana jerapah?", "زَرَافَةٌ"), P("أَيْنَ الطَّائِرُ؟", "Di mana burung?", "طَائِرٌ"), P("أَيْنَ الْجَمَلُ؟", "Di mana unta?", "جَمَلٌ")] },
+  "ruang-tamu-belajar": { n: "Cari Benda", e: "🔎", kind: "perintah", items: [
+    P("أَيْنَ الْكُرْسِيُّ؟", "Di mana kursi?", "كُرْسِيٌّ"), P("أَيْنَ الطَّاوِلَةُ؟", "Di mana meja?", "طَاوِلَةٌ"), P("أَيْنَ الْكِتَابُ؟", "Di mana buku?", "كِتَابٌ"),
+    P("أَيْنَ الْمِصْبَاحُ؟", "Di mana lampu?", "مِصْبَاحٌ"), P("أَيْنَ الْبَابُ؟", "Di mana pintu?", "بَابٌ"), P("أَيْنَ النَّافِذَةُ؟", "Di mana jendela?", "نَافِذَةٌ")] },
+  "perpustakaan": { n: "Cari Buku", e: "📚", kind: "perintah", items: [
+    P("أَيْنَ الْقِصَّةُ؟", "Di mana cerita?", "قِصَّةٌ"), P("أَيْنَ الرَّفُّ؟", "Di mana rak?", "رَفٌّ"), P("أَيْنَ الْمَجَلَّةُ؟", "Di mana majalah?", "مَجَلَّةٌ"),
+    P("أَيْنَ الْقَامُوسُ؟", "Di mana kamus?", "قَامُوسٌ"), P("أَيْنَ الدَّفْتَرُ؟", "Di mana buku tulis?", "دَفْتَرٌ"), P("أَيْنَ الْمُعَلِّمُ؟", "Di mana guru?", "مُعَلِّمٌ")] },
+  "kantin": { n: "Pesan Makanan", e: "🍽️", kind: "perintah", items: [
+    P("أُرِيدُ مَاءً", "Saya ingin air", "مَاءٌ"), P("أُرِيدُ خُبْزًا", "Saya ingin roti", "خُبْزٌ"), P("أُرِيدُ أَرُزًّا", "Saya ingin nasi", "أَرُزٌّ"),
+    P("أُرِيدُ حَلِيبًا", "Saya ingin susu", "حَلِيبٌ"), P("أُرِيدُ تُفَّاحًا", "Saya ingin apel", "تُفَّاحٌ"), P("أُرِيدُ مَوْزًا", "Saya ingin pisang", "مَوْزٌ")] },
+  "jam-waktu": { n: "Atur Jarum Jam", e: "🕒", kind: "jam", items: [] },
+  "saya-suka-bahasa-arab": { n: "Lengkapi Kalimat", e: "✏️", kind: "lengkapi", items: [
+    L("___ الْكِتَابَ", "أَقْرَأُ", ["أَقْرَأُ", "أَشْرَبُ", "أَنَامُ", "أَجْرِي"], "Saya membaca buku."), L("___ الْقِرَاءَةَ", "أُحِبُّ", ["أُحِبُّ", "أَكْتُبُ", "أَشْرَبُ", "أَنَامُ"], "Saya suka membaca."),
+    L("___ الْمَاءَ", "أَشْرَبُ", ["أَشْرَبُ", "أَقْرَأُ", "أَرْسُمُ", "أَجْرِي"], "Saya minum air."), L("___ الدَّرْسَ", "أَكْتُبُ", ["أَكْتُبُ", "أَنَامُ", "أَشْرَبُ", "أَجْرِي"], "Saya menulis pelajaran."),
+    L("أَنَا ___ اللُّغَةَ الْعَرَبِيَّةَ", "أُحِبُّ", ["أُحِبُّ", "أَجْرِي", "أَنَامُ", "أَشْرَبُ"], "Saya suka bahasa Arab.")] },
+  "kegiatan-liburan": { n: "Urutkan Cerita", e: "🗂️", kind: "urut", items: [
+    U(0, 0, "أَوَّلًا، أَذْهَبُ إِلَى الشَّاطِئِ", "Pertama, saya pergi ke pantai.", "🏖️"), U(0, 1, "ثُمَّ أَسْبَحُ فِي الْبَحْرِ", "Lalu saya berenang di laut.", "🏊"),
+    U(0, 2, "بَعْدَ ذَلِكَ أَلْعَبُ مَعَ أَصْدِقَائِي", "Setelah itu saya bermain dengan teman-temanku.", "⚽"), U(0, 3, "أَخِيرًا أَعُودُ إِلَى الْبَيْتِ", "Terakhir, saya pulang ke rumah.", "🏠"),
+    U(1, 0, "أَوَّلًا، أَرْكَبُ الْقِطَارَ", "Pertama, saya naik kereta.", "🚆"), U(1, 1, "ثُمَّ أَزُورُ بَيْتَ جَدِّي", "Lalu saya mengunjungi rumah kakekku.", "🏠"),
+    U(1, 2, "بَعْدَ ذَلِكَ أَذْهَبُ إِلَى الْحَدِيقَةِ", "Setelah itu saya pergi ke taman.", "🌳"), U(1, 3, "أَخِيرًا أَلْتَقِطُ صُورَةً", "Terakhir, saya mengambil foto.", "📷")] },
+  "piknik": { n: "Siapkan Bekal", e: "🧺", kind: "perintah", items: [
+    P("أَحْتَاجُ إِلَى مَاءٍ", "Saya butuh air", "مَاءٌ"), P("أَحْتَاجُ إِلَى طَعَامٍ", "Saya butuh makanan", "طَعَامٌ"),
+    P("أَحْتَاجُ إِلَى كُرَةٍ", "Saya butuh bola", "كُرَةٌ"), P("أَحْتَاجُ إِلَى سَلَّةٍ", "Saya butuh keranjang", "سَلَّةٌ")] },
+};
+
+// Kalimat contoh untuk menu "Kosakata dalam Kalimat".
+export function sentences(t: Theme): { ar: string; id: string; e: string }[] {
+  const m = MISI[t.slug];
+  const a = [...t.ex.map((s) => ({ ...s, e: t.e })), ...t.words.filter((w) => w.g).slice(0, 4).map((w, i) => ({ ...sentOf(w, true, i), e: w.e }))];
+  const b = m.kind === "perintah" ? m.items.slice(0, 3).map((x) => ({ ar: x.ar, id: x.id, e: t.words.find((w) => w.ar === x.w)?.e ?? t.e }))
+    : m.kind === "lengkapi" ? m.items.slice(0, 4).map((x) => ({ ar: x.ar.replace("___", x.ans ?? ""), id: x.id, e: t.e }))
+    : m.kind === "urut" ? m.items.filter((x) => x.s === 0).map((x) => ({ ar: x.ar, id: x.id, e: x.e ?? t.e }))
+    : [0, 1, 2].map((k) => ({ ar: `السَّاعَةُ ${ORD[k]}`, id: `Jam ${k + 1}.`, e: "🕒" }));
+  const seen = new Set<string>();
+  return [...a, ...b].filter((x) => (seen.has(x.ar) ? false : (seen.add(x.ar), true)));
+}

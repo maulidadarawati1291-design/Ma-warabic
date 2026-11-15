@@ -1,5 +1,5 @@
 import type { Look } from "./data";
-export type Res = { score: number; total: number };
+export type Res = { score: number; total: number; salah?: number };
 export type Prog = Record<string, Record<string, Res>>; // tema -> game -> hasil terbaik
 export type Profil = { nama: string; absen: string; avatar: Look };
 const PK = "mawarabic:profil";
@@ -34,20 +34,32 @@ function tone(f: number, t0: number, d: number, type: OscillatorType, v: number)
   g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.001, t + d);
   o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + d);
 }
-function applause() {
+function noise(sec: number, shape: (t: number) => number, freq: number, vol: number, delay = 0) {
   const c = ac(); if (!c) return;
-  const n = Math.floor(c.sampleRate * 0.9), b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0);
-  for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (Math.random() < 0.015 ? 1 : 0.12) * (1 - i / n);
+  const n = Math.floor(c.sampleRate * sec), b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0);
+  for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * shape(i / n);
   const s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
-  s.buffer = b; f.type = "bandpass"; f.frequency.value = 2200; g.gain.value = 0.5;
-  s.connect(f); f.connect(g); g.connect(c.destination); s.start(c.currentTime + 0.1);
+  s.buffer = b; f.type = "bandpass"; f.frequency.value = freq; g.gain.value = vol;
+  s.connect(f); f.connect(g); g.connect(c.destination); s.start(c.currentTime + delay);
 }
+// Letusan balon: "dor!"
+export function dor() { noise(0.3, (t) => Math.pow(1 - t, 3), 900, 1.2); tone(110, 0, 0.3, "sine", 0.7); }
+// Balon mengempis: desis turun.
+export function kempis() {
+  const c = ac(); if (!c) return;
+  const o = c.createOscillator(), g = c.createGain(), t = c.currentTime;
+  o.type = "sawtooth"; o.frequency.setValueAtTime(520, t); o.frequency.exponentialRampToValueAtTime(90, t + 0.9);
+  g.gain.setValueAtTime(0.08, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.9);
+  o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + 0.9);
+}
+// Gemuruh tepuk tangan panjang untuk permainan yang benar semua.
+export function tepukTangan() { noise(3.4, (t) => Math.min(1, t * 6) * (1 - Math.pow(t, 3)) * (Math.random() < 0.05 ? 1 : 0.3), 1800, 1.1); noise(3.4, (t) => Math.min(1, t * 5) * (1 - Math.pow(t, 3)) * (Math.random() < 0.04 ? 1 : 0.25), 3200, 0.8); }
 // Benar: sorak, tepuk tangan, semprotan konfeti, dan ucapan "صَحِيحٌ". Salah: bunyi "tet-tot" dan emoji sedih.
 export function reaksi(ok: boolean) {
-  if (ok) { [523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.09, 0.25, "triangle", 0.2)); applause(); }
+  if (ok) [523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.09, 0.25, "triangle", 0.2));
   else { tone(200, 0, 0.18, "square", 0.15); tone(150, 0.22, 0.3, "square", 0.15); }
   window.dispatchEvent(new CustomEvent("mw-reaksi", { detail: ok }));
-  if (ok) setTimeout(() => speak(`صَحِيحٌ! ${getProfil()?.avatar.sex === 1 ? "أَحْسَنْتِ" : "أَحْسَنْتَ"}`), 450);
+  if (ok) setTimeout(() => speak("صَحِيحٌ"), 450);
 }
 
 export const idOf = (nama: string, absen: string) => `${absen.trim()}-${nama.trim().toLowerCase()}`;
