@@ -1,5 +1,5 @@
 import type { Look } from "./data";
-export type Res = { score: number; total: number; salah?: number };
+export type Res = { score: number; total: number; salah?: number; kata?: string[]; at?: number };
 export type Prog = Record<string, Record<string, Res>>; // tema -> game -> hasil terbaik
 export type Profil = { nama: string; absen: string; avatar: Look };
 const PK = "mawarabic:profil";
@@ -67,7 +67,12 @@ export function getProfil(): Profil | null {
   try { const p = JSON.parse(localStorage.getItem(PK) || "null"); return p && typeof p.avatar?.sex === "number" && Array.isArray(p.avatar.acc) ? p : null; } catch { return null; }
 }
 export function setProfil(p: Profil) {
-  try { localStorage.setItem(PK, JSON.stringify(p)); } catch {}
+  try {
+    localStorage.setItem(PK, JSON.stringify(p));
+    const reg = JSON.parse(localStorage.getItem("mawarabic:siswa") || "{}");
+    reg[idOf(p.nama, p.absen)] = { nama: p.nama, absen: p.absen, avatar: p.avatar };
+    localStorage.setItem("mawarabic:siswa", JSON.stringify(reg));
+  } catch {}
 }
 const cur = () => { const p = getProfil(); return p ? idOf(p.nama, p.absen) : "tamu"; };
 
@@ -78,7 +83,7 @@ export function loadProg(id = cur()): Prog {
 export function saveRes(slug: string, game: string, r: Res) {
   const p = loadProg();
   const o = p[slug]?.[game];
-  if (!o || r.score >= o.score) p[slug] = { ...p[slug], [game]: r };
+  if (!o || r.score >= o.score) p[slug] = { ...p[slug], [game]: { ...r, at: Date.now() } };
   try { localStorage.setItem("mawarabic:v2:" + cur(), JSON.stringify(p)); } catch {}
 }
 export const points = (p: Prog) => Object.values(p).flatMap((g) => Object.values(g)).reduce((a, r) => a + r.score * 10, 0);

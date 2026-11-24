@@ -37,7 +37,7 @@ export function Match({ t, onSave, nav }: { t: Theme; onSave: Save; nav: Nav }) 
       const n = [...ok, p.k];
       setOk(n); setSel(null);
       if (n.length === pr.length) {
-        onSave("cocok", { score: pr.length - wrong.length, total: pr.length, salah: miss });
+        onSave("cocok", { score: pr.length - wrong.length, total: pr.length, salah: miss, kata: wrong.map((x) => x.ar) });
         if (miss === 0) tepukTangan();
       }
     } else {
@@ -103,7 +103,7 @@ export function Balon({ t, onSave, nav }: { t: Theme; onSave: Save; nav: Nav }) 
   }
   function next() {
     if (i + 1 < rs.length) { setI(i + 1); setPick(null); return; }
-    onSave("balon", { score: sc, total: rs.length, salah: rs.length - sc });
+    onSave("balon", { score: sc, total: rs.length, salah: rs.length - sc, kata: wrong.map((x) => x.ar) });
     if (sc === rs.length) tepukTangan();
     setDone(true);
   }

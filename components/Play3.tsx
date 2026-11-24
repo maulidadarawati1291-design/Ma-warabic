@@ -89,7 +89,7 @@ export function Huruf({ t, onSave, nav }: P) {
   }
   function next() {
     if (i + 1 < hs.length) { setI(i + 1); setBuilt([]); setPick(null); return; }
-    onSave("huruf", { score: sc, total: hs.length, salah: hs.length - sc });
+    onSave("huruf", { score: sc, total: hs.length, salah: hs.length - sc, kata: wrong.map((x) => x.ar) });
     if (sc === hs.length) tepukTangan();
     setDone(true);
   }
@@ -172,7 +172,7 @@ function MC({ t, m, onSave, nav }: PM) {
   }
   function next() {
     if (i + 1 < qs.length) { setI(i + 1); setPick(null); return; }
-    onSave("misi", { score: sc, total: qs.length, salah: qs.length - sc });
+    onSave("misi", { score: sc, total: qs.length, salah: qs.length - sc, kata: wrong.map((x) => x.ar) });
     if (sc === qs.length) tepukTangan();
     setDone(true);
   }
@@ -223,7 +223,7 @@ function Jam({ t, m, onSave, nav }: PM) {
   }
   function next() {
     if (i + 1 < hs.length) { setI(i + 1); setH(12); setChecked(false); return; }
-    onSave("misi", { score: sc, total: hs.length, salah: hs.length - sc });
+    onSave("misi", { score: sc, total: hs.length, salah: hs.length - sc, kata: wrong.map((x) => x.ar) });
     if (sc === hs.length) tepukTangan();
     setDone(true);
   }
@@ -283,7 +283,7 @@ function Urut({ t, m, onSave, nav }: PM) {
   function next() {
     if (i + 1 < ss.length) { setI(i + 1); setTk(shuffle(ss[i + 1].map((_, k) => k))); setBuilt([]); setChecked(false); return; }
     const total = ss.reduce((a, x) => a + x.length, 0);
-    onSave("misi", { score: sc, total, salah: total - sc });
+    onSave("misi", { score: sc, total, salah: total - sc, kata: wrong.map((x) => x.ar) });
     if (sc === total) tepukTangan();
     setDone(true);
   }

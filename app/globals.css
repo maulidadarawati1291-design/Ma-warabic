@@ -70,3 +70,5 @@ body {
 .shard { position: absolute; left: 50%; top: 40%; width: 10px; height: 10px; border-radius: 50%; animation: shard .6s ease-out forwards; }
 @keyframes shard { to { transform: translate(var(--sx), var(--sy)) scale(.2); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .letus, .kempis, .shard { animation: none !important; } .letus { opacity: 0; } }
+
+@media print { .no-print { display: none !important; } body { background: #fff; } }

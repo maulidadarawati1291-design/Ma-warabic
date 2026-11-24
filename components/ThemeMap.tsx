@@ -30,7 +30,7 @@ export default function ThemeMap() {
         </div>
         <div className="ml-auto text-right">
           <p className="text-2xl font-extrabold">⭐ {points(p)} poin</p>
-          <Link href="/" className="text-sm font-bold underline">Ganti profil</Link>
+          <Link href="/siswa" className="mr-3 text-sm font-bold underline">📊 Dashboard</Link><Link href="/" className="text-sm font-bold underline">Ganti profil</Link>
         </div>
       </div>
       <h1 className="mt-6 text-center text-4xl font-extrabold">Peta Petualangan</h1>

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, type CSSProperties } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ACCS, DEFAULT_LOOK, FACES, HAIRC, HAIRS, HIJABS, MOODS, OUTC, OUTFITS, SKINS, type Look, type Opt } from "@/lib/data";
 import { getProfil, idOf, loadProg, points, setProfil } from "@/lib/util";
@@ -95,6 +96,7 @@ export default function Masuk() {
         {cur === "acc" && <p className="mt-2 text-xs font-bold">Aksesori bisa dipakai bersamaan. Ketuk lagi untuk melepas.</p>}
         <button type="submit" disabled={!can} className="btn mt-6 w-full justify-center text-2xl">▶ Masuk</button>
       </form>
+      <p className="mt-4 text-sm font-bold"><Link href="/guru" className="underline">Masuk sebagai guru</Link></p>
     </main>
   );
 }

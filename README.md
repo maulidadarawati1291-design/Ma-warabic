@@ -44,3 +44,8 @@ Suara mengikuti jenis karakter (perempuan atau laki-laki). Efek suara sorak dan 
 - Game berikutnya terbuka setelah game sebelumnya selesai. Tiap game dimainkan sekali agar nilainya valid; setelah seluruh tema selesai, game bisa diulang.
 - Hasil tiap game menampilkan skor, jumlah salah, dan koreksi jawaban. Jumlah salah juga tersimpan (`salah`) pada data progres di `localStorage`.
 - Soal diacak dengan tingkat Mudah, Sedang, dan Sulit.
+
+## Dashboard
+- Siswa: `/siswa` (tombol "📊 Dashboard" di Peta). Isinya lencana, progres tiap tema, nilai rata-rata, kata yang perlu diulang, dan riwayat terbaru.
+- Guru: `/guru` (tautan "Masuk sebagai guru" di halaman masuk). PIN bawaan `guru123`; ganti lewat variabel lingkungan `NEXT_PUBLIC_GURU_PIN` di Vercel. PIN ini hanya pembatas sederhana di peramban, bukan keamanan sungguhan.
+- Data tersimpan di `localStorage` perangkat. Untuk menggabungkan beberapa perangkat: siswa menekan "Unduh hasilku untuk guru", lalu guru memilih berkas itu di "Gabungkan data". Untuk sinkronisasi otomatis antar perangkat dibutuhkan database online (misalnya Supabase).

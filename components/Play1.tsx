@@ -217,7 +217,7 @@ export function Quiz({ t, onSave, nav }: { t: Theme; onSave: Save; nav: Nav }) {
   }
   function next() {
     if (i + 1 < qs.length) { setI(i + 1); setPick(null); setBuilt([]); return; }
-    onSave("kuis", { score, total: qs.length, salah: qs.length - score });
+    onSave("kuis", { score, total: qs.length, salah: qs.length - score, kata: wrong.map((x) => x.ar) });
     if (score === qs.length) tepukTangan();
     setDone(true);
   }
